@@ -1,0 +1,362 @@
+---
+title:  "Generalised Linear Models for Poisson distributed data."
+author: "Emma Rand"
+output:
+  html_document:
+    toc: true
+    depth: 3
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    theme: yeti
+  word_document: default
+---
+![](../pics/58I.png)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE,
+                      include = FALSE)
+```
+
+```{r pkgs}
+library(ggplot2)
+```
+
+# Introduction
+
+## Aims
+In the second of three related workshops we will learn to apply and interpret the glm() function to poisson (count) response data.
+
+## Objectives 
+By actively following the first lecture, working through workbook examples during the workshop workshop and any completing follow-up independent study the successful student will be able to:
+
+* Explain the link between the general linear models and the generalised linear model
+* Recognise where a generalised linear model for a poisson distributed response would be appropriate and apply `glm()`
+* Determine which effects are significant using using `summary()` and `anova()`
+
+You can optionally stretch yourself by asking for more in-depth explanations about the meaning of the estimates, and the direction and magnitude of the effects or creating figures to go with your analyses. 
+
+
+# Workbook Instructions
+
+The workbook for this session is divided in to 2 sections. 
+
+**You are not expected do all of the workbook examples**
+
+Choose **one** from each section that best matches your biological interests. For each example you choose, you should:
+
+* write comments in your scripts!
+* read in the data file
+* check you understand the structure of the data
+* identify the response and explanatory variables
+* build a model with `glm()`
+* examine the model result using `summary()` and `anova()`
+* what are the model estimates?
+* interpret the results  
+* use `plot(mod, which = 1)` and `plot(mod, which = 2)` to examine the assumptions
+
+Optional Extension: Practice your plotting skills.
+
+
+# Workbook
+
+## Section 1
+
+**Choose one of the following examples**
+
+### Parkinson's disease 
+
+This example examines the progression of Parkinson's disease in flies with a Parkinson's disease-associated mutation.
+The effect of age on locomoter ability of flies with a Parkinson's disease-associated mutation was determined by using a climbing assay. Ten flies of each tested age were placed in 3 replicate vials and the number able to climb to a set height within set time was recorded.
+The data in are [park.txt](../data/park.txt) and the ages are given in days. Each row is a vial. Can you predict the number of mutant flies able to climb by their age?  
+
+```{r }
+#============== WORKBOOK EXAMPLE ==============#
+# Disease progression in Parkinson's disease-associated mutants
+# write comments in your scripts!
+
+# read in the data file
+park <- read.table("../data/park.txt", header = T)
+
+# check you understand the structure of the data
+str(park)
+# there are two variables and 21 observations. Both variables are integers
+
+# identify the response and explanatory variables
+# the response is 'flies'; the explanatory variable is 'age'
+
+# build a model with `glm()`
+mod <- glm(data = park, flies ~ age, family = "poisson")
+
+# examine the model result using `summary()` and `anova()`
+summary(mod)
+anova(mod, test = "Chisq")
+
+# what are the model estimates?
+# can be read from summary or accessed like this:
+mod$coefficients
+# note that the lm() estimates could have been accessed this way too
+
+# the model estimates are logged (to base e), therefore need to be antilogged for interpretation. Antilog is exp()
+exp(mod$coefficients) 
+#(Intercept)         age 
+#  6.8935499   0.9621374
+
+# interpret the results 
+# 6.9 flies are expected to be able to climb at age 0 (the intercept). For each day they age, the number that can climb is reduced significantly by a factor of 0.96 (p = 0.00719).
+# The Analysis of Deviance Table shows that overall the model is significantly better than a NULL model. A null model is one in which the response is unexplained. Another way to express this is to say the model expalins a signifcant amount of variation in the response.
+# For glm() it is deviance rather than variance that tells us about model fit.
+
+# use `plot(mod, which = 1)` and `plot(mod, which = 2)` to examine the assumptions
+plot(mod, which = 1)
+plot(mod, which = 2)
+# These look ok, though note that it is difficult to tell with small samples. However, there is nothing that screams the assumptions are unmet.
+
+# plot
+ggplot(data = park, aes(x = age, y = flies)) +
+  geom_point() + 
+  geom_smooth(method = "glm",
+              method.args = list(family = "poisson"),
+              se = FALSE) +
+  xlab("Age (days)") +
+  ylab("Number of flies able to climb") +
+  theme_classic()
+
+```
+
+----------------------------------------
+
+### Protein kinase
+
+This example concerns the effect of a Mitogen-activated protein (MAP) Kinase Inhibitor on the number of nuclei in neurons
+The importance of Mitogen-activated protein kinases in regulating cell division led researchers to hypothesise that MAPK inhibition might effect cytokinesis following mitosis. They treated samples of neurons with PD089059, a MAPK inhibitor, at various concentrations (1 to 15 in arbitrary units) and recorded the number of nuclei per cell.
+The data in are [kinase.txt](../data/kinase.txt). Each row is a cell. Can you predict the number of nuclei by PD089059 concentration?  
+
+```{r }
+#============== WORKBOOK EXAMPLE ==============#
+# The effect of a MAPK Kinase Inhibitor on the number of nuclei in neurons
+# write comments in your scripts!
+
+# read in the data file
+kinase <- read.table("../data/kinase.txt", header = T)
+
+# check you understand the structure of the data
+str(kinase)
+# there are two variables and 30 observations. Both variables are integers
+
+# identify the response and explanatory variables
+# the response is 'nuclei'; the explanatory variable is 'pdconc'
+
+# build a model with `glm()`
+mod <- glm(data = kinase, nuclei ~ pdconc, family = "poisson")
+
+# examine the model result using `summary()` and `anova()`
+summary(mod)
+anova(mod, test = "Chisq")
+
+# what are the model estimates?
+# can be read from summary or accessed like this:
+mod$coefficients
+# note that the lm() estimates could have been accessed this way too
+
+# the model estimates are logged (to base e), therefore need to be antilogged for interpretation. Antilog is exp()
+exp(mod$coefficients) 
+# (Intercept)      pdconc 
+#    1.007766    1.089617  
+
+# interpret the results 
+# 1.01 nuclei are expected when pdconc is zero (the intercept). For each unit increase in pdconce, the number that nuclei increases significantly by a factor of 1.09 (p = 0.00624).
+# The Analysis of Deviance Table shows that overall the model is significantly better than a NULL model. A null model is one in which the response is unexplained. Another way to express this is to say the model explains a signifcant amount of variation in the response.
+# For glm() it is deviance rather than variance that tells us about model fit.
+
+# use `plot(mod, which = 1)` and `plot(mod, which = 2)` to examine the assumptions
+plot(mod, which = 1)
+plot(mod, which = 2)
+# These look ok, though note that it is difficult to tell with small samples. However, there is nothing that screams the assumptions are unmet.
+
+# plot
+ggplot(data = kinase, aes(x = pdconc, y = nuclei)) +
+  geom_point() + 
+  geom_smooth(method = "glm",
+              method.args = list(family = "poisson"),
+              se = FALSE) +
+  xlab("PD089059 concentration") +
+  ylab("Number of nuclei") +
+  theme_classic()
+
+```
+
+----------------------------------------
+
+
+## Section 2
+
+**Choose one of the following examples**
+
+### Number of mutations
+
+This example is about how the number of mutations in a hypermutable tetranucleotide marker is affected by a person's age and whether of not they have cancer.
+The number of mutations in the hypermutable tetranucleotide marker D7S1482 were analysed in buccal specimens from 30 head and neck carcinoma cases and 43 controls. Also recorded was the subject's age (in years). The goal of analysis was to determine whether age and cancer status could predict the number of mutations. The data are in  [mutation.txt](../data/mutation.txt) and comprise the following variables:
+
+* mut : the number of mutations
+* age : a continuous measure of the subject's age to the nearest 0.1 of a degree.
+* cat : a factor with two levels, "control" and "tumour"
+
+
+```{r }
+#============== WORKBOOK EXAMPLE ==============#
+#The effect of age and cancer status on the number of mutations in a hypermutable tetranucleotide marker
+# read in the data file
+mutation <- read.table("../data/mutation.txt", header = TRUE)
+
+# check you understand the structure of the data
+str(mutation)
+# there are three variables and 73 observations. Two variables are numbers, 
+# one is a factor with two levels
+
+# identify the response and explanatory variables
+# the response is 'mut'; the explanatory variables are 'age' and 'cat'
+
+# build a model with `glm()`
+mod <- glm(data = mutation, mut ~ cat * age, family = "poisson")
+
+# examine the model result using `summary()` and `anova()`
+summary(mod)
+anova(mod, test = "Chisq")
+
+# what are the model estimates?
+# can be read from summary or accessed like this:
+mod$coefficients
+# note that the lm() estimates could have been accessed this way too
+
+# the model estimates are logged (to base e), therefore need to be antilogged for interpretation. Antilog is exp()
+exp(mod$coefficients) 
+# (Intercept)     cattumour           age cattumour:age 
+#    7.863668      1.335158      1.008159      1.015422  
+
+# interpret the results 
+# the intercept is the number of mutations when the cat factor is control (level 1) and age is zero, 7.89 mutations. This increases but not significantly, by a factor of 1.34 in the tumour group. For every unit increase in age in the control group, the number of mutations increases by a factor of 1.01 (NS) but there is a bigger effect of age on the number of mutations in the tumour group. Based on the effects of cat and age we would expect an increasee of 7.863668*1.008159*1.335158 = 10.5849 mutations per unit of age in the tumour group. But we get 7.863668*1.008159*1.335158*1.015422 = 10.74814
+
+# one way to help you think about the results is to make the predictions
+# this requires creating a data frame of the x values fromn which you want to predict
+newdata <- data.frame(cat = rep(c("control", "tumour"), each = 3), age = rep(c(0:2), times = 2))
+# then predicting
+newdata$pred <- predict(mod, newdata = newdata, type = "response")
+# The Analysis of Deviance Table shows that the effects of age, cat and the interaction between them are significant.
+# For glm() it is deviance rather than variance that tells us about model fit.
+
+# use `plot(mod, which = 1)` and `plot(mod, which = 2)` to examine the assumptions
+plot(mod, which = 1)
+plot(mod, which = 2)
+# These look ok.
+
+# plot
+ggplot(data = mutation, aes(x = age, y = mut, colour = cat)) +
+  geom_point() + 
+  geom_smooth(method = "glm",
+              method.args = list(family = "poisson"),
+              se = FALSE) +
+  scale_color_manual(values = c("black", "gray75"), 
+                       name = "Patient\nCategory",
+                       labels = c("Control", "Tumour")) +
+  xlab("Age (years)") +
+  ylab("Number of mutations") +
+  theme_classic()
+
+```
+
+----------------------------------------
+
+### Birds catching insects
+
+This example considers the effects of age and group size on the ability of birds to catch insects.
+The number of insect prey individuals of a particular bird species manages to collect varies. In an effort to understand this variation, researchers recorded the number of prey an individual caught, its age and how it spent the majority of it's time (as a single individual, in a pair or in a group of many). The data are in [prey.txt](../data/prey.txt) and comprise following variables:
+
+* prey    : the number of insect prey items caught
+* age     : the individual's age in years (to one tenth of a year) 
+* group   : how the individual spent the majority of its time; a factor with three levels "many", "pair", "single"
+
+
+The goal of analysis was to determine if the number of prey items caught could be explained by age, habitat and group.
+
+```{r }
+#============== WORKBOOK EXAMPLE ==============#
+#The effect of age, habitat and group size on the ability of birds to catch insects
+#read in data
+# read in the data file
+prey <- read.table("../data/prey.txt", header = TRUE)
+
+# check you understand the structure of the data
+str(prey)
+# there are three variables and 30 observations. Two variables are numbers, 
+# one is a factor with three levels
+
+# identify the response and explanatory variables
+# the response is 'prey'; the explanatory variables are 'age' and 'group'
+
+# build a model with `glm()`
+mod <- glm(data = prey, prey ~ group * age, family = "poisson")
+
+# examine the model result using `summary()` and `anova()`
+summary(mod)
+anova(mod, test = "Chisq")
+
+# what are the model estimates?
+# can be read from summary or accessed like this:
+mod$coefficients
+# note that the lm() estimates could have been accessed this way too
+
+# the model estimates are logged (to base e), therefore need to be antilogged for interpretation. Antilog is exp()
+exp(mod$coefficients) 
+#     (Intercept)       grouppair     groupsingle             age   grouppair:age 
+#      16.3384547       0.6596448       0.2451576       1.3399780       0.8449379 
+# groupsingle:age 
+#       0.7242438  
+
+# interpret the results 
+# the intercept is the number of prey when the group factor is many (level 1) and age is zero, 16.3 prey. This decreases but not significantly, by a factor of 0.66 in the pair group and significantly by a factor of 0.25 in the single group. For every unit increase in age in the many group, the number of prey increases significantly by a factor of 1.34. However, the effect of age is signifcantly less in the pairs and singles. Based on the effects of grouppairs and age we would expect a increasee of 16.3384547*0.6596448*1.3399780 = 14.44172 per unit of age in the pairs group. But we only get 16.3384547*0.6596448*1.3399780*0.8449379 = 12.20235 per unit of age.
+#  Based on the effects of groupsingle and age we would expect an increase of 16.3384547*0.2451576*1.335158 = 5.34797 per unit of age in the single group. But we get 16.3384547*0.2451576*1.335158*0.7242438 = 3.873234. It looks like individuals learn how to catch prey better in pairs than singles and better in many than singles.
+
+# one way to help you think about the results is to make the predictions
+# this requires creating a data frame of the x values fromn which you want to predict
+newdata <- data.frame(group = rep(c("many", "pair", "single"), each = 3),
+                      age = rep(c(0:2), times = 3))
+# then predicting
+newdata$pred <- predict(mod, newdata = newdata, type = "response")
+# The Analysis of Deviance Table shows that the effects of age, group and the interaction between them are significant.
+# For glm() it is deviance rather than variance that tells us about model fit.
+
+# use `plot(mod, which = 1)` and `plot(mod, which = 2)` to examine the assumptions
+plot(mod, which = 1)
+plot(mod, which = 2)
+# These look okish
+
+# plot
+ggplot(data = prey, aes(x = age, y = prey, colour = group)) +
+  geom_point() + 
+  geom_smooth(method = "glm",
+              method.args = list(family = "poisson"),
+              se = FALSE) +
+  scale_color_manual(values = c("black", "gray45", "gray75"), 
+                       name = "Group Size",
+                       labels = c("Many", "Pair", "single")) +
+  xlab("Age (years)") +
+  ylab("Number of prey") +
+  theme_classic()
+```
+
+# The Rmd file
+
+Suggested analyses and interpretation for Workbook examples are marked:
+
+`#============== WORKBOOK EXAMPLE ==============#` 
+
+
+[Rmd file](QCworkshop2DataAnalysis.Rmd)
+
+
+
+![](../pics/58Iend.png)
+
+

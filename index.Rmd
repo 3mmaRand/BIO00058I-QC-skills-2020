@@ -1,0 +1,12 @@
+---
+title: "Workshop Index"
+author: "Emma Rand"
+
+output: html_document
+---
+
+# [Workshop 1](workbook/workshop-1.Rmd)
+
+# [Workshop 2](workbook/workshop-2.Rmd)
+
+# [Workshop 3](workbook/workshop-3.Rmd)
