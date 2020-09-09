@@ -1,5 +1,5 @@
 ---
-title:  "Linear models: t-tests and ANOVA revisited."
+title:  "Topic 1: Linear models: t-tests and ANOVA revisited."
 author: "Emma Rand"
 output:
   html_document:
@@ -13,686 +13,398 @@ output:
 ---
 ![](../pics/58I.png)
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE,
+knitr::opts_chunk$set(include = FALSE,
                       message = FALSE,
                       warning = FALSE,
                       include = FALSE)
 ```
 
+```{r pkgs}
+library(tidyverse)
+library(multcomp)
+```
+
+
 # Introduction
 
 ## Aims
-In the first of three related workshops we revisit tests you have seen previously such as _t_-tests and ANOVA but now in the framework of the General Linear Model.  We will learn to apply and interpret the lm() function.
+There are two aims for this topic. First to explain how the t-test, ANOVA and regression are actually all the same test and introduce the terminology of statistical modelling and, secondly, to teach you how to use and interpret the `lm()` function in R. 
 
 ## Objectives 
-By actively following the first lecture, working through workbook examples during the workshop workshop and any completing follow-up independent study the successful student will be able to:
+By doing the independent study before each Blackboard workshop and working with others to solve workshop problems the successful student will be able to:
 
 * Explain the link between t-tests, ANOVA and regression
 * Appropriately apply linear models using `lm()`
-* Interpret the results using `summary()` and `anova()` and relate them to the outputs of `t.test()` and `aov()`
+* Interpret the results and relate them to the outputs of `t.test()` and `aov()`
 
-You can optionally stretch yourself by asking for more in-depth explanation, creating figures to go with your analyses, or doing 'More advanced examples'
+Note that you should also be able to report the results of the examples and workshop problems which was a Stage 1 learning objective for 17C and 8C.
 
 
-# Workbook Instructions
+# Instructions
 
-The workbook for this session is divided in to 3 sections. 
+Designate roles: 
+1. the code host
+2. the report host
 
-**You are not expected do all of the workbook examples**
+The code host types the code and comments that you collaboratively write. The report host types the report using googledocs that you collaboratively write. At the start of a problem the code host shares their screen showing RStudio and towards the end, the report host will share their screen.
 
-Choose **one** (or two, if keen) from each section that best matches your biological interests. 
+Topic text book: [gist-lm: Get Introductory Statistical Tests as Linear models: A guide for R users](https://3mmarand.github.io/gist-lm/)
 
-For each example you choose:
+For each data scenario:
 
-* write comments in your scripts!
-* read in the data file
+* use a new RStudio Project containing folders: `data-raw`, `scripts` and `figures`
 * check you understand the structure of the data
 * identify the response and explanatory variables
-* build a model with `lm()`
-* examine the model result using `summary()` and `anova()`
-* what are the group means?
-* what does the `summary()` reveal about signifcant effects?
-* use `plot(mod, which = 1)` and `plot(mod, which = 2)` to examine the assumptions
-* consider whether to do post-hoc testing with `lsmeans()` and `pairs()`
+* make a quick plot of the data and summarise it
+* build a model with `lm()` and examine it using `summary()`
+* what are the model coefficients and how do they relate to the group means
+* what proportion of the variance in the response is explained by the model? 
+* evaluate whether the assumptions of the linear model are met
+* determine whether the effects are significant  
+* write a report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
+* post your report to the padlet
+* go through your code adding comments, removing code that no longer reflects steps in your analysis and reporting, and reordering where necessary  
+* examine some of the other reports posted on the padlet. What did you do well? What could you have done better? Add these as comments to your own padlet post
+* make sure the RStudio Project and the googledoc is shared with everyone in your group
 
 
-Optional Extension: Practice your plotting skills.
 
-# Workbook
+# Data scenarios
 
-## Section 1
+## 1. Nicotinic acid on adipocytes
 
-**Choose one of the following examples**
-
-
-----------------------------------------
-
-### Nicotinic acid on adipocytes
-
-This example is about the effect of nicotinic acid treatment on the adiponectin secretion of an adipocytes cell line.
-Adiponectin is exclusively secreted from adipose tissue and modulates a number of metabolic processes. Nicotinic acid can affect adiponectin secretion. 3T3-L1 adipocytes were treated with nicotinic acid or with a control treatment and adiponectin concentration (pg/mL) measured. The data are in [adipocytes.txt](../data/adipocytes.txt). Each row represents an independent sample of adipocytes and the first column gives the concentration adiponectin and the second column indicates whether they were treated with nicotinic acid or not.
+Adiponectin is exclusively secreted from adipose tissue and modulates a number of metabolic processes. Its secretion can be affected by nicotinic acid. 3T3-L1 adipocytes were treated with nicotinic acid or with a control treatment and adiponectin concentration (pg/ml) measured. The data are in [adipocytes.txt](../data/adipocytes.txt). Each row represents an independent sample of adipocytes and the first column gives the concentration adiponectin and the second column indicates whether they were treated with nicotinic acid or not.
 
 ```{r }
-#============== WORKBOOK EXAMPLE ==============#
 # The effect of nicotinic acid treatment on the adiponectin secretion of an adipocytes cell line
-
+# library(tidyverse)
 # read in the data file
-adip <- read.table("../data/adipocytes.txt", header = T)
-
-# check you understand the structure of the data
-str(adip)
+adip <- read_table2("../data-raw/adipocytes.txt")
 
 # identify the response and explanatory variables
-# adiponectin is the response, treatment (control or nicotinic) is the one explanatory variable
+# the response is adiponectin a continuous variable. treatment is the explanatory variable with two levels: nicotinic and control
 
-# build a model with `lm()`
-mod <- lm(adiponectin ~ treatment, data = adip)
- 
-# examine the model result using `summary()` and `anova()`
+# make a quick plot of the data and summarise it
+# quick plot
+ggplot(data = adip, aes(x = treatment, y = adiponectin)) +
+  geom_violin()
+# the control mean is a bit lower than the nicotinic treatment mean
+# summarise
+adip_summary <- adip %>% 
+  group_by(treatment) %>%
+  summarise(mean = mean(adiponectin),
+            std = sd(adiponectin),
+            n = length(adiponectin),
+            se = std/sqrt(n))
+
+# build a model with `lm()` and examine it using `summary()`
+mod <- lm(data = adip, adiponectin ~ treatment)
 summary(mod)
-anova(mod)
-# this is the equivalent of a two sample t-test, i.e., one explanatory variable with two levels
-# so the p value for the 'slope' estimate = the p vlaue for the whole model as seen on the last line
-# of the summary() and the treatment effect given in the anova()
+# what are the model coefficients and how do they relate to the group means
+# The first group of treatment is control so  
+# b0 = 5.546 pg/ml is the mean of the control treated cells. 
+# b1 = 1.9627 is labelled treatmentnicotinic and is the difference between the control treated and nicotinic acid treated cells. Thus the mean of the these cells is 5.5460 + 1.9627= 7.5087 pg/ml
 
-# what are the group means?
-# the mean for the control is 5.5 +/- 0.42 and that for the 
-# nicotinic acid treated cells is siginfcantly higher at about 7.5
+# what proportion of the variance in the response is explained by the model? 
+# 0.2767
 
-# what does the `summary()` reveal about signifcant effects?
-# the control group has a mean sig diff from zero - probably not of interest; the gap between the
-# control group and the nicotinic group is significant
-# this model explains 28% of the variation in the response. 
-# the different treatments account for 28% of the variance in adiponectin, 
-# the rest is unexplained (or random)
-
-# use `plot(mod, which = 1)` and `plot(mod, which = 2)` to examine the assumptions
+# evaluate whether the assumptions of the linear model are met
 plot(mod, which = 2)
 plot(mod, which = 1)
-shapiro.test(mod$res)
-# the residuals seem to be normally distributed and be homoscedastic
+# these look fine
 
-# consider whether to do post-hoc testing with `lsmeans()` and `pairs()` 
-# no need to do a post-hoc as there are only two groups and we already know
-# the difference between them is significant
+# determine whether the effects are significant  
+# the effect of treating with nicotinic acid is significant ( p = 0.0028) we can tell because b1 is significant (the F test of model overall tells us the same)
+# figure 
+p <- ggplot() +
+  geom_jitter(data = adip, 
+              aes(x = treatment, y = adiponectin), 
+              width = 0.25) +
+  geom_errorbar(data = adip_summary,
+                aes(x = treatment,
+                    ymin = mean,
+                    ymax = mean),
+                width = .3) +
+  geom_errorbar(data = adip_summary,
+                aes(x = treatment,
+                    ymin = mean - se,
+                    ymax = mean + se),
+                width = .6) +
+  geom_segment(aes(x = 1, y = 11, xend = 2, yend = 11)) +
+  geom_segment(aes(x = 1, y = 11, xend = 1, yend = 10.8)) +
+  geom_segment(aes(x = 2, y = 11, xend = 2, yend = 10.8)) +
+  annotate("text", x = 1.5, y = 11.2,  label = "**", size = 6) +
+  scale_x_discrete(labels = c("Control", "Nicotinic acid"),
+                   name = "Treatment") +
+  scale_y_continuous(name = "Adiponectin (pg/ml)",
+                     expand = c(0, 0),
+                     limits = c(0, 12)) +
+  theme_classic() +
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14))
 
-
-#a figure
-#summarise the data 
-library(Rmisc)
-adipsummary <- summarySE(adip,
-                         measurevar = "adiponectin",
-                         groupvars = c("treatment"))
-library(ggplot2)
-fig <- ggplot(adip, aes(x = treatment,y = adiponectin) ) +
-  geom_jitter(width = 0.2, colour = "grey") +
-  geom_errorbar(data = adipsummary, aes(ymin = adiponectin,
-                    ymax = adiponectin),
-                width = .1) +
-  geom_errorbar(data = adipsummary, aes(ymin = adiponectin - se,
-                    ymax = adiponectin + se),
-                width = .2) +
-  ylim(0, 10) +
-  ylab("Adiponectin (pg/mL)") +
-  xlab("Treatment") +
-  scale_x_discrete(labels = c("Control", "Adiponectin")) +
-  theme_classic()
-```
-
-----------------------------------------
-
-### Omega 3 _Cannabis sativa_
-
-Some plant biotechnologists are trying to increase the quantity of omega 3 fatty acids in _Cannabis sativa_. They have developed a genetically modified line using genes from _Linum usitatissimum_ (linseed). They grow 50 wild type and fifty modified plants to maturity, collect the seeds and determine the amount of omega 3 fatty acids. The data are in [csativa.txt](../data/csativa.txt). Do you think their modification has been successful? 
-
-```{r}
-# Comparison of genetically modified _Cannabis sativa_
-
-# read in the data file
-csativa <- read.table("../data/csativa.txt", header = T)
-
-# check you understand the structure of the data
-str(csativa)
-
-# identify the response and explanatory variables
-# adiponectin is the response, treatment (control or nicotinic) is the one explanatory variable
-
-# build a model with `lm()`
-mod <- lm(omega ~ plant, data = csativa)
- 
-# examine the model result using `summary()` and `anova()`
-summary(mod)
-anova(mod)
-# this is the equivalent of a two sample t-test, i.e., one explanatory variable with two levels
-# so the p value for the 'slope' estimate = the p vlaue for the whole model as seen on the last line
-# of the summary() and the treatment effect given in the anova()
-
-# what are the group means?
-# the mean for the gm plant is 49.5 +/- 1.14 
-# and that for the WT is siginfcantly higher at 54.6. that is not a successful modication
-
-# what does the `summary()` reveal about signifcant effects?
-# the WT group has a mean sig diff from zero - probably not of interest; the gap between the
-# WT group and the GMO group is significant
-# this model explains only ~10% of the variation in the response. 
-# the different treatments account for 10% of the variance in omega, 
-# the rest is unexplained (or random)
-
-# use `plot(mod, which = 1)` and `plot(mod, which = 2)` to examine the assumptions
-plot(mod, which = 2)
-plot(mod, which = 1)
-shapiro.test(mod$res)
-# the residuals don't look too bad but there does seem to be higher variance in WT. 
-# You might consider a Kruskal-Wallis a better choice
-
-# consider whether to do post-hoc testing with `lsmeans()` and `pairs()`
-# no need to do a post-hoc as there are only two groups and we already know
-# the difference between them is significant
-
-
-#a figure
-#summarise the data 
-library(Rmisc)
-csativasummary <- summarySE(csativa,
-                         measurevar = "omega",
-                         groupvars = c("plant"))
-library(ggplot2)
-fig <- ggplot(csativa, aes(x = plant, y = omega) ) +
-  geom_jitter(width = 0.2, colour = "grey") +
-  geom_errorbar(data = csativasummary, aes(ymin = omega,
-                                           ymax = omega),
-                width = .1) +
-  geom_errorbar(data = csativasummary, aes(ymin = omega - se,
-                                           ymax = omega + se),
-                width = .2) +
-  xlab("Plant type") +
-  ylab("Amount of Omega 3 (units)") +
-  ylim(0, 60) +
-  scale_x_discrete(labels = c("Modified", "Wild Type")) +
-  theme_classic()
-
+ggsave("../figures/adiponectin.tif", 
+       plot = p, 
+       device = "tiff",
+       width = 3.2, 
+       height = 3.2,
+       units = "in",
+       dpi = 300)
 
 ```
 
-----------------------------------------
 
-### Egg laying in a parasitic wasp 
+## 2. Comparing standardization Methods
 
-The data in [wasp.txt](../data/wasp.txt) concern the egg-laying behaviour of a species of parasitic wasp, laying its eggs on a beetle larva. Wasps and other Hymenopterans (Ants and Bees) are haplo-diploid: unfertilised eggs are haploid and develop into males, whereas fertilised eggs are diploid and develop into females. Researchers wanted to know if mating status affected the time the wasp takes to lay its eggs (in hours). Each row represents an individual wasp. The first column gives the time taken and the second column indicates whether they are mated (1) or unmated (0). 
-
-```{r}
-#============== WORKBOOK EXAMPLE ==============#
-# The effect of fertilisation on the length of time it takes a female parasitic wasp to lay her eggs
-# read in file
-wasp <- read.table("../data/wasp.txt", header = T)
-str(wasp)
-# notice the status is not a factor and needs to be
-wasp$status <- factor(wasp$status)
-  
-#build and examine model
-mod <- lm(time ~ status,data = wasp)
-summary(mod)
-# interpret the results
-#the mean for the unmated is 23.367 +/- 1.749 and that for the mated  is siginfcantly lower at 23.4
-#evaluate the model
-#this model explains 15% of the variation in the response. whether the eggs are fertilisaed or not accounts for 15% of the variance in laying time, the rest is unexplained (or random)
-#
-# consider whether to do post-hoc testing with `lsmeans()` and `pairs()`
-# no need to do a post-hoc as there are only two groups and we already know
-# the difference between them is significant
-#
-#assumptions
-plot(mod, which = 2)
-plot(mod, which = 1)
-shapiro.test(mod$res)
-# the residuals seem to be normally distributed and be homoscedastic though 39 does look to be a bit of an outlier
-#a figure
-waspsummary  <-  summarySE(wasp, measurevar = "time", 
-                           groupvars = c("status"))
-#plot
-fig <- ggplot(wasp, aes(x = status, y = time) ) + 
-  geom_jitter(width = 0.2, colour= "gray") +
-  geom_errorbar(data= waspsummary, aes(ymin = time - se, ymax = time + se), width = .2) + 
-  geom_errorbar(data= waspsummary, aes(ymin = time, ymax = time), width = .1) + 
-  ylab("Time to lay (hours)") +
-  xlab("Female") +
-  scale_x_discrete(labels = c("Mated", "Unmated")) + 
-  theme_classic()
-
-```
-
-##  Section 2
-
-**Choose one of:**
-
-----------------------------------------
-
-### Myoglobin in seals
-
-The myoglobin concentration of skeletal muscle of three species of seal in grams per kilogram of muscle was determined and the data are given in [seal.txt](../data/seal.txt). We want to know if there is a difference between species.  Each row represents an individual seal. The first column gives the myoglobin concentration and the second column indicates species
+Researchers measure concentration of long-chain hydrocarbons, in a single unknown sample by three methods of standardisation using gas chromatography. They wish to determine whether the three standardisations methods give the same concentrations. The data are given in [analyte.txt](../data-raw/analyte.txt) and the first column gives the analyte concentration determined in parts per million and the second column indicates the standardisations method 'standard', 'internal standard' or 'standard addition'.
 
 ```{r}
-#============== WORKBOOK EXAMPLE ==============#
-# Myoglobin concentration in skeletal muscle of different seal species
-
+# The effect of standardization method on the concentration of long-chain hydrocarbons determined (ppm) from a single sample
+# library(tidyverse)
+# library(multcomp)
 # read in the data file
-seal <- read.table("../data/seal.txt", header = T)
-
-# check you understand the structure of the data
-str(seal)
+analyte <- read_table2("../data-raw/analyte.txt")
 
 # identify the response and explanatory variables
-# myoglobin is the response, species (three levels) is the one explanatory variable
+# the response is ppm a continuous variable. method is the explanatory variable with three levels: internal_standard, standard and standard_addition
 
-# build a model with `lm()`
-mod <- lm(myoglobin ~ species, data = seal)
- 
-# examine the model result using `summary()` and `anova()`
+# make a quick plot of the data and summarise it
+# quick plot
+ggplot(data = analyte, aes(x = method, y = ppm)) +
+  geom_violin()
+# two of the methods give similar readings but the standard_addition method is giving lower concentrations
+# summarise
+analyte_summary <- analyte %>% 
+  group_by(method) %>%
+  summarise(mean = mean(ppm),
+            std = sd(ppm),
+            n = length(ppm),
+            se = std/sqrt(n))
+
+# build a model with `lm()` and examine it using `summary()`
+mod <- lm(data = analyte, ppm ~ method)
 summary(mod)
-anova(mod)
-# this is the equivalent of a one-way anova, i.e., one explanatory variable with three levels
-# so there are two p value for the two 'slope' estimates which are not equal to the p value
-# for the whole model as seen on the last line of the summary()
-# p value # for the whole model as seen on the last line of the summary() = the species effect given in the anova()
+# what are the model coefficients and how do they relate to the group means
+# The first group of method is internal_standard so  
+# b0 = 170.425 ppm is the mean of the internal_standard.  
+# b1 = 4.500 is labelled methodstandard and is the difference between the internal_standard and standard methods, i.e., 170.425 + 4.500= 174.925 ppm.
+# b2 = -27.375 is labelled methodstandard_addition and is the difference between the internal_standard and standard_addition methods, i.e., 170.425 -27.375 = 143.05 ppm.
 
-# what are the group means? what does the `summary()` reveal about signifcant effects?
-# then mean +/- se for bladdernose is 42.32 +/- 1.47 
-# that for harbour is signifcantly higher at 49.01 (which is 42.32 with 6.69 added). 
-# weddell is higher than bladdernose at 44.66 (which is 42.32 with 2.34 added), but not signicantly so
-# this model explains 10.1% of the variation in the response. 
-# the different seal species account for 10.1% of the variance in myoglobin, 
-# the rest is unexplained (or random)
+# what proportion of the variance in the response is explained by the model? 
+# 0.8966
 
-
-# use `plot(mod, which = 1)` and `plot(mod, which = 2)` to examine the assumptions
+# evaluate whether the assumptions of the linear model are met
 plot(mod, which = 2)
 plot(mod, which = 1)
-shapiro.test(mod$res)
-# the residuals seem to be normally distributed and be homoscedastic
+# to be honest, the total number of data points makes this difficult to assess robustly
+# but from what we can see, there are no big issues.
 
-# consider whether to do post-hoc testing with `lsmeans()` and `pairs()`
-# we need a post hoc to see if the difference between harbour and weddell is sig
-# the summary only coompares each level to the intercept
-library(lsmeans)
-post <- lsmeans(mod, ~ species)
-pairs(post)
-# the only difference lies between bladdernose and harbour
-
-
-# figure
-sealsummary <- summarySE(seal, 
-                         measurevar = "myoglobin", groupvars = c("species"))
-fig <- ggplot(seal, aes(x = species, y = myoglobin) ) +
-  geom_jitter(width = .2, colour = "#8c8c8c") +
-  geom_errorbar(data = sealsummary, 
-                aes(ymin = myoglobin, 
-                    ymax = myoglobin), 
-                width=.2, size = 1 ) + 
-  geom_errorbar(data = sealsummary, 
-                aes(ymin = myoglobin - se, 
-                    ymax = myoglobin + se), 
-                width = .3 ) +
-  annotate("segment", x = 1, xend = 2, 
-           y = 72, yend = 72,
-           colour = "black") +
-  annotate("segment", x = 2, xend = 2, 
-           y = 72, yend = 70,
-           colour = "black") +
-  annotate("segment", x = 1, xend = 1, 
-           y = 72, yend = 70,
-           colour = "black") +
-  annotate("text", x = 1.5,  y = 74, 
-           label = "**", size = 8) +
-  ylab(expression("Myoglobin concentration g "*Kg^{-1})) +
-  ylim(0, 75) +
-  xlab("Species") +
-  scale_x_discrete(labels = c("Bladdernose", "Harbour", "Weddell"))+
-  theme(panel.background = element_rect(fill = "white"))+
-  theme(axis.line.x = element_line(color = "black"),
-        axis.line.y = element_line(color = "black"))
-```
-
-----------------------------------------
-
-### Comparing standardization Methods
-
-Researchers measure concentration of long-chain hydrocarbons, in a single unknown sample by three methods of standardisation using gas chromatography. They wish to determine whether the three standardisations methods give the same concentrations. The data are given in [analyte.txt](../data/analyte.txt) and the first column gives the analyte concentration determined in parts per million and the second column indicates the standardisations method 'standard', 'internal standard' or 'standard addition'.
-
-```{r}
-#============== WORKBOOK EXAMPLE ==============#
-# Comparison of Three Standardization Methods
-
-# read in the data file
-analyte <- read.table("../data/analyte.txt", header = T)
-
-# check you understand the structure of the data
-str(analyte)
-
-# identify the response and explanatory variables
-# ppm is the response, method (three levels) is the one explanatory variable
-
-# build a model with `lm()`
-mod <- lm(ppm ~ method, data = analyte)
- 
-# examine the model result using `summary()` and `anova()`
-summary(mod)
+# determine whether the effects are significant  
 anova(mod)
-# this is the equivalent of a one-way anova, i.e., one explanatory variable with three levels
-# so there are two p value for the two 'slope' estimates which are not equal to the p value
-# for the whole model as seen on the last line of the summary()
-# p value # for the whole model as seen on the last line of the summary() = the method effect given in the anova()
-
-# what are the group means?
-# the mean +/- se for internal_standard is 170.42 +/- 2.761,
-# that for standard is higher (4.5 higher) but not siginifcantly so. 
-# standard_additional is signifcantly lower (27.37 lower) than standard_internal
-
-# what does the `summary()` reveal about signifcant effects?
-# # this model explains 90% of the variation in the response. 
-# the different methods account for 90% of the variance in ppm, 
-# the rest is unexplained (or random)
-
-
-# use `plot(mod, which = 1)` and `plot(mod, which = 2)` to examine the assumptions
-plot(mod, which = 2)
-plot(mod, which = 1)
-shapiro.test(mod$res)
-# small samples but the residuals seem to be normally distributed and be homoscedastic
-
-# consider whether to do post-hoc testing with `lsmeans()` and `pairs()` 
-# we need a post hoc to see if the difference between harbour and weddell is sig
-# the summary only coompares each level to the intercept
-library(lsmeans)
-post <- lsmeans(mod, ~ method)
-pairs(post)
-# standard_addition is sig lower than both the others
+# the effect of method is significant ( p < 0.001) When there is only one variable in the model, this is the same as the F test at the end of the summary.
+# we know from the summary that the internal_standard and standard_addition methods differ (because b2 was significant) but we need a post-hoc test to check all the pairwise comparisons. I'm using glht from the multcomp package to do a Tukey test
+# I need to make the method variable a factor and rebuild the model
+analyte$method <- factor(analyte$method)
+mod <- lm(data = analyte, ppm ~ method)
+mod_mc <- glht(mod, linfct = mcp(method = "Tukey"))
+summary(mod_mc)
+# the standard_addition method gives significantly lower concentrations than the other two methods.
 
 # figure 
-analytesummary <- summarySE(analyte, 
-                            measurevar = "ppm", 
-                            groupvars = c("method"))
+p <- ggplot() +
+  geom_jitter(data = analyte, 
+              aes(x = method, y = ppm), 
+              width = 0.25) +
+  geom_errorbar(data = analyte_summary,
+                aes(x = method,
+                    ymin = mean,
+                    ymax = mean),
+                width = .3) +
+  geom_errorbar(data = analyte_summary,
+                aes(x = method,
+                    ymin = mean - se,
+                    ymax = mean + se),
+                width = .6) +
+  geom_segment(aes(x = 1, y = 190, xend = 2, yend = 190)) +
+  geom_segment(aes(x = 1, y = 190, xend = 1, yend = 187)) +
+  geom_segment(aes(x = 2, y = 190, xend = 2, yend = 187)) +
+  annotate("text", x = 1.5, y = 192,  label = "***", size = 6) +
+  geom_segment(aes(x = 1, y = 196, xend = 3, yend = 196)) +
+  geom_segment(aes(x = 1, y = 196, xend = 1, yend = 193)) +
+  geom_segment(aes(x = 3, y = 196, xend = 3, yend = 193)) +
+  annotate("text", x = 2, y = 198,  label = "***", size = 6) +
+  scale_x_discrete(labels = c("Internal\nStandard", "Standard", "Standard\nAdditional"),
+                   name = "Method") +
+  scale_y_continuous(name = "LCHC concentration (ppm)",
+                     expand = c(0, 0),
+                     limits = c(0, 210)) +
+  theme_classic() +
+  theme(axis.text = element_text(size = 11),
+        axis.title = element_text(size = 14))
 
-fig <- ggplot(analyte, aes(x = method, y = ppm) ) +
-  geom_jitter(width = .2, colour = "#8c8c8c") +
-  geom_errorbar(data = analytesummary, 
-                aes(ymin = ppm, 
-                    ymax = ppm), 
-                width=.2, size = 1 ) + 
-  geom_errorbar(data = analytesummary, 
-                aes(ymin = ppm - se, 
-                    ymax = ppm + se), 
-                width = .3 ) +
-  annotate("segment", x = 1, xend = 3, 
-           y = 200, yend = 200,
-           colour = "black") +
-  annotate("segment", x = 3, xend = 3, 
-           y = 200, yend = 195,
-           colour = "black") +
-  annotate("segment", x = 1, xend = 1, 
-           y = 200, yend = 195,
-           colour = "black") +
-  annotate("text", x = 2,  y = 205, 
-           label = "***", size = 5) +
-  annotate("segment", x = 2, xend = 3, 
-           y = 190, yend = 190,
-           colour = "black") +
-  annotate("segment", x = 2, xend = 2, 
-           y = 190, yend = 185,
-           colour = "black") +
-  annotate("segment", x = 3, xend = 3, 
-           y = 190, yend = 185,
-           colour = "black") +
-  annotate("text", x = 2.5,  y = 195, 
-           label = "***", size = 5) +
-  ylab("PPM" ) +
-  ylim(0, 220) +
-  xlab("method") +
-  scale_x_discrete(labels = c("Internal Standard", 
-                              "Standard", 
-                              "Standard addition"))+
-  theme(panel.background = element_rect(fill = "white"))+
-  theme(axis.line.x = element_line(color = "black"),
-        axis.line.y = element_line(color = "black"))
-```
-
-----------------------------------------
-
-### Insecticides
-
-The data in [biomass.txt](../data/biomass.txt) are taken from an experiment in which the biomass (g) of insect pest species was measured on plots sprayed with different insecticides. The intention was to determine which insecticide was most effective. This example is slightly more challenging.
-
-
-```{r}
-#============== WORKBOOK EXAMPLE ==============#
-# insect biomass with different insecticide treatments
-biom <- read.table("../data/biomass.txt", header = T)
-str(biom) # this shows the data are in separate columns
-
-# so we need to stack the data to be able to analyse it
-biom <- stack(biom)
-str(biom) # now we have a column of the values and a column for the groups.
-# I will rename
-names(biom)<-c("biomass", "spray")
-# build and examine model
-mod <- lm(biomass ~ spray, data = biom)
-summary(mod)
-# interpret the results
-#then means for 
-# A is 130.37 
-# B is higher than A at 130.37 + 21.19 = 151.56 but not sig so
-# C is higher than A at 130.37 + 19.81 = 150.18 but not sig so
-# D is signifcantly higher than A at 130.37 + 76.51 = 206.88 
-# etc
-# this model explains 71% of the variation in the response. 
-# the different sprays account for 71% of the variance in biomass, the rest is unexplained (or random)
-
-# anova on the model
-anova(mod)
-
-# assumptions
-plot(mod, which = 2)
-plot(mod, which = 1)
-shapiro.test(mod$res)
-# the residuals seem to be normally distributed and be homoscedastic 
-
-# post-hoc 
-library(lsmeans)
-
-post <- lsmeans(mod, ~ spray)
-pairs(post)
-
-# figure
-biomsummary <- summarySE(biom, measurevar = "biomass",
-                             groupvars = c("spray"))
-
-fig <- ggplot(biomsummary, aes(x = spray, y = biomass) ) +
-  geom_point() +
-  geom_errorbar(aes(ymin=biomass - se,
-                    ymax=biomass + se), width=.1) +
-  ylab("Pest Biomass (units)") +
-  ylim(0,350) +
-  xlab("Spray") +
-  annotate("text", x = 6, y = 20, label = "A") +
-  annotate("text", x = 5, y = 20, label = "A") +
-  annotate("text", x = 4, y = 40, label = "B") +
-  annotate("text", x = 2, y = 40, label = "B") +
-  annotate("text", x = 3, y = 40, label = "B") +
-  annotate("text", x = 2, y = 60, label = "C") +
-  annotate("text", x = 3, y = 60, label = "C") +
-  annotate("text", x = 1, y = 60, label = "C") +
-  theme_classic()
-#    Figure 1. The mean pest biomass following various insecticide treatments. Error bars are $\pm$ 1 S.E. and means that do not differ significantly are labelled with the letter.
-```
-
-## Section 3 
-
-**Choose one of:**
-
-----------------------------------------
-
-### Fertilsers on crop yield
-The data in [yield.txt](../data/yield.txt) come from a two-factor design in which crop yield (in kilograms) was determined from plots treated with low and high levels of nitrogen and low and high levels of potassium. 
-
-![](../pics/nk.png)
-
-```{r}
-#============== WORKBOOK EXAMPLE ==============#
-
-#read in file
-yield <- read.table("../data/yield.txt", header = T)
-str(yield)
-#build and examine model
-mod <- lm(kg ~ nitrogen * potassium, data = yield)
-summary(mod)
-# interpret the results
-# the mean for the high K and high N is 21.3 
-# in comparison the mean for the high K and low N is reduced and so is the mean for low K and high N
-#there does not seem to be an interaction
-#evaluate the model
-#this model explains 49% of the variation in the response. the differenct treatments account for 49% of the variance in yield, the rest is unexplained (or random)
-#anova on the model
-anova(mod)
-#assumptions
-plot(mod, which = 2)
-plot(mod, which = 1)
-shapiro.test(mod$res)
-# the residuals seem to be normally distributed and be homoscedastic
-# 
-# post-hoc 
-library(lsmeans)
-
-post <- lsmeans(mod, ~ nitrogen * potassium)
-pairs(post)
+ggsave("../figures/lchc.tif", 
+       plot = p, 
+       device = "tiff",
+       width = 3.2, 
+       height = 3.2,
+       units = "in",
+       dpi = 300)
 
 ```
 
-----------------------------------------
 
-### Neuroscience
 
-This example concerns the effect of maternal choline deficiency on neuron cross sectional area in two brain regions in Mice.
-Postnatal cognitive performance is influenced by the choline intake in utero. To better understand this phenomenon, pregnant mice were fed a control or choline-deficient diet and their offspring examined. The cross sectional area (CSA) of cholinergic neurons was determined in two brain regions, the MSN and the DB. The data are given in [neuronregion.txt](../data/neuronregion.txt)
+## 3. Choline deficiency on neuron size
+
+Cognitive performance is influenced by the choline intake in utero. To better understand this phenomenon, pregnant mice were fed a control or choline-deficient diet and their offspring examined. The cross sectional area (CSA) of cholinergic neurons was determined in two brain regions, the MSN and the DB. The data are given in [neuronregion.txt](../data-raw/neuronregion.txt)
 
 ```{r}
-#============== WORKBOOK EXAMPLE ==============#
 # The effect of maternal choline deficiency on neuron cross sectional area in two brain regions in Mice
 #read in file
-neuron <- read.table("../data/neuronregion.txt", header = T)
-str(neuron)
-#build and examine model
-mod <- lm(CSA ~ BrainRegion * Diet, data = neuron)
-summary(mod)
-# interpret the results
-#the mean for the DB-control is 26.665 and that for MSN-control is siginfcantly lower
-#the mean for the DB-Deficient siginfcantly lower than DB-control
-#there's an interaction (the effect of diet in DB is much greater than in MSN)
+# library(tidyverse)
+# library(multcomp)
+# read in the data file
+neuron <- read_table2("../data-raw/neuronregion.txt")
 
-#evaluate the model
-#this model explains 40% of the variation in the response. the three sources of variation (each main effect and the interaction) account for 40% of the variance in CSA, the rest is unexplained (or random)
-#anova on the model
-anova(mod)
-#assumptions
+# identify the response and explanatory variables
+# the response is CSA a continuous variable. There are two explanatory variables: Diet with two level (control and deficient) and BrainRegion with two levels (DB and MSN)
+
+# make a quick plot of the data and summarise it
+# quick plot
+ggplot(data = neuron, aes(x = Diet, y = CSA, fill = BrainRegion)) +
+  geom_violin()
+# it looks like the deficient diet does affect the cross sectional area of neurons, but mainly in the DB region. There seems to be a difference between the brain regions in a normal diet but not in the deficiant diet.
+# summarise
+neuron_summary <- neuron %>% 
+  group_by(Diet, BrainRegion) %>%
+  summarise(mean = mean(CSA),
+            std = sd(CSA),
+            n = length(CSA),
+            se = std/sqrt(n))
+
+# build a model with `lm()` and examine it using `summary()`
+mod <- lm(data = neuron, CSA ~ Diet * BrainRegion)
+summary(mod)
+# what are the model coefficients and how do they relate to the group means
+# The first group of Diet is control and the first group of BrainRegion is DB so  
+# b0 = 26.665 is the mean of the Control-DB 
+# b1 = -5.440 is labelled DietDeficient and is the difference between the Control-DB and Deficient-DB, i.e., the mean of Deficient-DB is 26.665 - 5.440 = 21.225 is 
+# b2 = -5.695 is labelled BrainRegionMSN and is the difference between the Control-DB and Control-MSN, i.e., the mean of Control-MSN is 26.665 - 5.695 = 20.97 
+# b4 = 4.403 is labelled DietDeficient:BrainRegionMSN and is the effect of changing both diet and region that is additional to their independent effects, i.e., the mean of Deficient-MSN is 26.665 - 5.440 -5.695 + 4.403 =  19.933 
+
+# what proportion of the variance in the response is explained by the model? 
+# 0.4034
+
+# evaluate whether the assumptions of the linear model are met
 plot(mod, which = 2)
 plot(mod, which = 1)
-shapiro.test(mod$res)
-#the residuals seem to be normally distributed and be homoscedastic 
+# these look ok
 
-# post hoc
-post <- lsmeans(mod, ~ BrainRegion * Diet)
-pairs(post)
-
-```
-
-
-## More advanced examples
-
-These are few more complex examples which the especially keen would be able to tackle because the 'general linear model' is extendable and the same principles apply. 
-
-----------------------------------------
-
-### Response to cancer treatment
-
-This example concerns the effect of patient genotype and their glutathione concentration on their sensitivity to cytoxic drugs.
-Patients vary in their response to cancer treatment. This may be because sensitivity to cytotoxic (anti-cancer) drugs is influenced by genotype. However, glutathione (GSH) concentration is also implicated in treatment sensitivity. Researchers measure treatment sensitivity and GSH concentration for patients that had one of three alleles ("A2","AA01","B34"). The data are in [response.txt](../data/response.txt) and comprise the following variables:
-
-* GSH: a continuous measure glutathione concentration
-* sens: a continuous measure of treatment sensitivity in arbitrary units
-* genotype: a factor with three levels,A2, AA01 and B34
-
-```{r}
-#============== MORE ADVANCED EXAMPLES ==============#
-# The effect of genotype and glutathione concentration on sensitivity to cytoxic drugs
-#In the workbook examples, you had one categorical explanatory variable or two. You've also previously done example with one continuous explnatory variable (regression). However, in the example, one of the explanatory variables is categories and one is continuous.
-# read in data
-resp <- read.table("../data/response.txt", header = T)
-# Build a model to predict treatment sensitivity
-mod <- lm(data = resp, sens ~ genotype * GSH)
-summary(mod)
+# determine whether the effects are significant  
 anova(mod)
-#there is a sig effect of genotype and a sig effect gsh but there is no interaction between them. this means the slope of the relationship between gsh and sens is the same for the three genotypes. the intercepts for the three genotypes differ. the model explains 60% of the variation in sensitivity
-#we could consider taking the interaction out of the model since it is not sig
-mod2 <- lm(data = resp, sens ~ genotype + GSH)
-summary(mod2)
-anova(mod,mod2)
-#this shows that the more complex model does not give a significant reduction in RSS
-#let's carry on with the simple model, with the interaction
-anova(mod2)
-#the relationship between gsh and sens is postive - as gsh increases so does sens. genotype AA01 has the highest sens, then A2 with B34 having the lowest.
+# the effect of Diet is significant (p = 0.004) 
+# the effect of BrainRegion is significant (p = 0.002)
+# but the interaction between them is significant (p = 0.046). 
+# we need a post-hoc test to check all the pairwise comparisons. I'm using glht from the multcomp package to do a Tukey test
+# I need to make the Dto create a new factor variable that indicates membership of one of the four groups
+neuron$dietxbr <- interaction(neuron$Diet, neuron$BrainRegion)
+mod <- lm(data = neuron, CSA ~ dietxbr)
+mod_mc <- glht(mod, linfct = mcp(dietxbr = "Tukey"))
+summary(mod_mc)
+# The differnces are between: Deficient.DB and  Control.DB (p = 0.00482); Control.MSN and Control.DB (p =  0.00296); and Deficient.MSN and Control.DB (p < 0.001). Control.DB differs from all but there are no other differences
+# figure 
+# palette
+# blue, pink, green triadic
+pal4 <- c("#256c7a", "#7a256c", "#6c7a25")
 
-#assumptions
-plot(mod2, which = 2)
-plot(mod2, which = 1)
-shapiro.test(mod2$res)
-#the residuals look just about ok
+p <- ggplot() +
+  geom_point(data = neuron, aes(x = Diet,
+                                    y = CSA,
+                                    colour = BrainRegion),
+             position = position_jitterdodge(dodge.width = 1,
+                                             jitter.width = 0.15,
+                                             jitter.height = 0),
+             size = 2) +
+  geom_errorbar(data = neuron_summary, 
+                aes(x = Diet, ymin = mean - se, ymax = mean + se, group = BrainRegion),
+                width = 0.5, size = 1,
+                position = position_dodge(width = 1)) +
+  geom_errorbar(data = neuron_summary, 
+                aes(x = Diet, ymin = mean, ymax = mean, group = BrainRegion),
+                width = 0.4, size = 1,
+                position = position_dodge(width = 1) ) +
+  scale_x_discrete(name = "Diet") +
+  scale_y_continuous(name = "CSA (units)",
+                     expand = c(0, 0),
+                     limits = c(0, 45)) +
+  scale_colour_manual(values = pal4[1:2], name = "Brain Region") +
+  # Deficient.DB - Control.DB **
+  annotate("segment",
+           x = 0.75, xend = 1.25,
+           y = 35, yend = 35,
+           colour = "black") +
+  annotate("segment",
+           x = 1.25, xend = 1.25,
+           y = 35, yend = 34,
+           colour = "black") +
+  annotate("segment",
+           x = 0.75, xend = 0.75,
+           y = 35, yend = 34,
+           colour = "black") +
+  annotate("text",
+           x = 1,  y = 36,
+           label = "***", size = 6) +
+  # Control.MSN - Control.DB **
+  annotate("segment",
+           x = 0.75, xend = 1.75,
+           y = 38, yend = 38,
+           colour = "black") +
+  annotate("segment",
+           x = 0.75, xend = 0.75,
+           y = 38, yend = 37,
+           colour = "black") +
+  annotate("segment",
+           x = 1.75, xend = 1.75,
+           y = 38, yend = 37,
+           colour = "black") +
+  annotate("text", x = 1.25,  y = 39,
+           label = "**", size = 6) +
+# Deficient.MSN - Control.DB ***
+  annotate("segment",
+           x = 0.75, xend = 2.25,
+           y = 41, yend = 41,
+           colour = "black") +
+  annotate("segment",
+           x = 0.75, xend = 0.75,
+           y = 41, yend = 40,
+           colour = "black") +
+  annotate("segment",
+           x = 2.25, xend = 2.25,
+           y = 41, yend = 40,
+           colour = "black") +
+  annotate("text", x = 1.5,  y = 42,
+           label = "***", size = 6) +
+  theme_classic() +
+  theme(legend.title = element_text(size = 11),
+        legend.text = element_text(size = 9),
+        legend.position = c(0.2, 0.2),
+        axis.text = element_text(size = 11),
+        axis.title = element_text(size = 14))
 
-ggplot(data = resp, aes(x = GSH, y = sens, color = genotype)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
-  xlim(0, 7) +
-  ylim(0, 40) +
-  theme_classic()
+ggsave("../figures/neuron.tif", 
+       plot = p, 
+       device = "tiff",
+       width = 3.5, 
+       height = 4,
+       units = "in",
+       dpi = 300)
 
-```
 
-----------------------------------------
 
-### Clover yield
-
-Replicated plots of clover were grown in one of three rotations, 2-, 4-, or 8-year cycles and the total seed production calculated. The density of yarrow stems is known to affect clover yield so was this was included as a covariate. The data are in [clover.txt](../data/clover.txt) and comprise the following variables:
-
-* clov.y: a continuous measure clover yield
-* yarrow.s: a (practically) continuous measure of yarrow stem density in arbitrary units
-* cycle: a factor with three levels,A, B and C
-
-```{r}
-#============== MORE ADVANCED EXAMPLES ==============#
-# The effect of varying rotation period on clover yield when the impact of yarrow density is included.
-#In the workbook examples, you had one categorical explanatory variable or two. You've also previously done example with one continuous explnatory variable (regression). However, in the example, one of the explanatory variables is categories and one is continuous.
-# read in data
-clover <- read.table("../data/clover.txt", header = T)
-str(clover)
-# Build a model to predict treatment sensitivity
-mod <- lm(data = clover, clov.y ~ cycle * yarrow.s)
-summary(mod)
-anova(mod)
-#there is a sig effect of cycle and a sig effect yarrow and a sig interaction between them. this means that the effect of yarrow on clover yield depends on the cycle - i.e., the slope of the relationship between clover yield  and yarrow density diffrs between cycles. the model explains 78% of the variation in sensitivity. The slop is negative in A, more negative in B and even more negative in C. When yarrow = 0 for each group (the intercepts), A has the smallest yield and C the greatest.
-#assumptions
-plot(mod, which = 2)
-plot(mod, which = 1)
-shapiro.test(mod$res)
-#the residuals look just about ok. points 12 and 15 are quite a long way below the fitted line which is distorting the residuals vs fitted plot.
 ```
 
 
 # The Rmd file
-
-Suggested analyses and interpretation for Workbook examples are marked:
-
-`#============== WORKBOOK EXAMPLE ==============#` 
-
-Suggested analyses and interpretation for more advanced examples are marked:
-
-`#============== MORE ADVANCED EXAMPLES ==============#` 
 
 
 [Rmd file](QCworkshop1DataAnalysis.Rmd)

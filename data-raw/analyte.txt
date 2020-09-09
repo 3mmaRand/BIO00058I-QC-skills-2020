@@ -1,0 +1,13 @@
+ppm method
+179.3 standard
+169.4 standard
+176.1 standard
+174.9 standard
+176.4 internal_standard
+162.7 internal_standard
+172.2 internal_standard
+170.4 internal_standard
+135.3 standard_addition
+142.8 standard_addition
+151.1 standard_addition
+143 standard_addition
