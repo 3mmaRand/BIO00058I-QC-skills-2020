@@ -24,7 +24,6 @@ library(tidyverse)
 library(multcomp)
 ```
 
-
 # Introduction
 
 ## Aims
@@ -39,6 +38,14 @@ By doing the independent study before each Blackboard workshop and working with 
 
 Note that you should also be able to report the results of the examples and workshop problems which was a Stage 1 learning objective for 17C and 8C.
 
+## Independent Study
+This should have been carried out before the workshop.
+There is a text book, gist-lm: Get Introductory Statistical Tests as Linear models: A guide for R users to support this topic which is freely available here:  [gist-lm: Get Introductory Statistical Tests as Linear models: A guide for R users](https://3mmarand.github.io/gist-lm/)
+
+We suggest you carry out the independent study in two sessions:
+
+1. Read the Preface, Introduction (Chapters 1-3) and Chapter 4 Single linear regression
+2. Read Chapters 6 and 7
 
 # Instructions
 
@@ -47,8 +54,6 @@ Designate roles:
 2. the report host
 
 The code host types the code and comments that you collaboratively write. The report host types the report using googledocs that you collaboratively write. At the start of a problem the code host shares their screen showing RStudio and towards the end, the report host will share their screen.
-
-Topic text book: [gist-lm: Get Introductory Statistical Tests as Linear models: A guide for R users](https://3mmarand.github.io/gist-lm/)
 
 For each data scenario:
 

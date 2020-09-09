@@ -1,8 +1,6 @@
----
-title: |
-  ![](pics/58I.png)  
-  Overview
----
+![](pics/58I.png)  
+
+# Overview
 
 ## Introduction
 
