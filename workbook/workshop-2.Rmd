@@ -27,26 +27,21 @@ library(multcomp)
 # Introduction
 
 ## Aims
-There are two aims for this topic. First to explain how the t-test, ANOVA and regression are actually all the same test and introduce the terminology of statistical modelling and, secondly, to teach you how to use and interpret the `lm()` function in R. 
+The aim for this topic is to teach you how to use and interpret the `glm()` function in R for response data which are Poisson distributed (counts). 
 
 ## Objectives 
 By doing the independent study before each Blackboard workshop and working with others to solve workshop problems the successful student will be able to:
 
-* Explain the link between t-tests, ANOVA and regression
-* Appropriately apply linear models using `lm()`
-* Interpret the results and relate them to the outputs of `t.test()` and `aov()`
+* Explain the link between the general linear models and the generalised linear model
+* Recognise a Poisson distributed response variable
+* Appropriately apply generalised linear models to Poisson distributed data using `glm()`
+* Interpret and report the results 
 
-Note that you should also be able to report the results of the examples and workshop problems which was a Stage 1 learning objective for 17C and 8C.
 
 ## Independent Study
 
-This should have been carried out before the workshop.
-There is a text book, gist-lm: Get Introductory Statistical Tests as Linear models: A guide for R users to support this topic which is freely available here:  [gist-lm: Get Introductory Statistical Tests as Linear models: A guide for R users](https://3mmarand.github.io/gist-lm/)
-
-We suggested you carry out the independent study in two sessions:
-
-1. Read the Preface, Introduction (Chapters 1-3) and Chapter 4 Single linear regression
-2. Read Chapters 6 and 7
+The minimum independent study required was to read the Preface and chapters 1, 2 and 3 of [singlm:](https://3mmarand.github.io/singlm/) ***S**imple **In**troduction to **GLM** for analysing Poisson and Binomial responses in R*.
+An optional extension was to read chapter 4 in preparation for the optional extension data scenario.
 
 # Instructions
 
@@ -63,156 +58,196 @@ For each data scenario:
 * check you understand the structure of the data
 * identify the response and explanatory variables
 * make a quick plot of the data and summarise it
-* build a model with `lm()` and examine it using `summary()`
-* what are the model coefficients and how do they relate to the group means
-* what proportion of the variance in the response is explained by the model? 
-* evaluate whether the assumptions of the linear model are met
-* determine whether the effects are significant  
+* build a model with `glm()` and examine it using `summary()`
+* what are the model coefficients and how do these relate to the response?
+* what is the null deviance of the response? And the residual deviance of model? 
+* determine the reduction in deviance and whether it is significant 
+* evaluate whether the assumptions of the model are met
+* use `predict()` to make predictions for a set sensible values for the explanatory variable(s)   
 * write a report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
-* post your report to the padlet
+* post your report to the Padlet
 * go through your code adding comments, removing code that no longer reflects steps in your analysis and reporting, and reordering where necessary  
-* examine some of the other reports posted on the padlet. What did you do well? What could you have done better? Add these as comments to your own padlet post
+* examine some of the other reports posted on the Padlet. What did you do well? What could you have done better? Add these as comments to your own Padlet post
 * make sure the RStudio Project and the googledoc is shared with everyone in your group
 
 
 
 # Data scenarios
 
-## 1. 
-
-
-
-This example examines the progression of Parkinson's disease in flies with a Parkinson's disease-associated mutation.
-The effect of age on locomoter ability of flies with a Parkinson's disease-associated mutation was determined by using a climbing assay. Ten flies of each tested age were placed in 3 replicate vials and the number able to climb to a set height within set time was recorded.
-The data in are [park.txt](../data/park.txt) and the ages are given in days. Each row is a vial. Can you predict the number of mutant flies able to climb by their age?  
+## 1. The effect of age on locomotor ability of mutant flies
+The effect of age on locomotor ability of *Drosophila* with a Parkinson's disease-associated mutation was determined by using a climbing assay. Ten flies of each tested age (in days) were placed in 3 replicate vials and the number able to climb to a set height within a set time was recorded. The data in are [park.txt](../data-raw/park.txt). Each row is a vial.   
 
 ```{r }
-#============== WORKBOOK EXAMPLE ==============#
 # Disease progression in Parkinson's disease-associated mutants
-# write comments in your scripts!
 
+# library(tidyverse)
 # read in the data file
-park <- read.table("../data/park.txt", header = T)
+park <- read_table2("../data-raw/park.txt")
 
 # check you understand the structure of the data
 str(park)
-# there are two variables and 21 observations. Both variables are integers
+# there are two numeric variables
 
 # identify the response and explanatory variables
-# the response is 'flies'; the explanatory variable is 'age'
+# the response is the number of flies in a vial that can climb to the given height within a set time; age is the explanatory variable
 
-# build a model with `glm()`
-mod <- glm(data = park, flies ~ age, family = "poisson")
+# make a quick plot of the data and summarise it
+ggplot(data = park, aes(x = age, y = flies)) +
+  geom_point()
+# it looks at the fewer older flies are able to make the climb
 
-# examine the model result using `summary()` and `anova()`
+# build a model with `glm()` and examine it using `summary()`
+mod <- glm(data = park, flies ~ age, family = poisson)
+
+# what are the model coefficients?
+mod
+exp(mod$coefficients)
+# b0 is 1.9306 and b1 is -0.0386 
+# the predicts 6.89 age 0 flies will be able to make the climb and this changes by a factor of 0.96 for each da (i.e., decreases)
+# the equation of the line is ln(flies)  = 1.9306 -0.0386 × age or
+# flies = 6.8935499 * 0.9621374^age
+
+# what is the null deviance of the response? And the residual deviance of model? 
 summary(mod)
+# the Null deviance is 23.484  and the Residual deviance is 16.177  
+
+# determine the reduction in deviance and whether it is significant 
+# the deviance has reduced by 7.307
 anova(mod, test = "Chisq")
+# this is a significant reduction p = 0.006868
 
-# what are the model estimates?
-# can be read from summary or accessed like this:
-mod$coefficients
-# note that the lm() estimates could have been accessed this way too
-
-# the model estimates are logged (to base e), therefore need to be antilogged for interpretation. Antilog is exp()
-exp(mod$coefficients) 
-#(Intercept)         age 
-#  6.8935499   0.9621374
-
-# interpret the results 
-# 6.9 flies are expected to be able to climb at age 0 (the intercept). For each day they age, the number that can climb is reduced significantly by a factor of 0.96 (p = 0.00719).
-# The Analysis of Deviance Table shows that overall the model is significantly better than a NULL model. A null model is one in which the response is unexplained. Another way to express this is to say the model expalins a signifcant amount of variation in the response.
-# For glm() it is deviance rather than variance that tells us about model fit.
-
-# use `plot(mod, which = 1)` and `plot(mod, which = 2)` to examine the assumptions
+# evaluate whether the assumptions of the model are met
 plot(mod, which = 1)
 plot(mod, which = 2)
-# These look ok, though note that it is difficult to tell with small samples. However, there is nothing that screams the assumptions are unmet.
+# these look 'ok' although the sample size is modest
 
-# plot
-ggplot(data = park, aes(x = age, y = flies)) +
-  geom_point() + 
-  geom_smooth(method = "glm",
+# use `predict()` to make predictions for a set sensible values for the explanatory variable(s)   
+# her I do it for ages from 10 to 30 days in steps of 5 days (5 values)
+# create a data frame of the x values from which you want to predict
+predictions <- data.frame(age = seq(10, 30, 5))
+# add predictions to that data.frame
+predictions$pred <- predict(mod, newdata = predictions, type = "response")
+
+# write a report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
+p <- ggplot(data = park, aes(x = age, y = flies)) +
+  geom_point() +
+geom_smooth(method = "glm",
               method.args = list(family = "poisson"),
-              se = FALSE) +
-  xlab("Age (days)") +
-  ylab("Number of flies able to climb") +
+              se = FALSE,
+            colour = "black") +
+  scale_x_continuous(expand = c(0, 0),
+                     limits = c(0, 35),
+                     name = "Age (days)") +
+    scale_y_continuous(expand = c(0, 0.03),
+                      breaks = seq(0, 10, 2),
+                     limits = c(0, 10),
+                     name = "Number of flies") +
   theme_classic()
 
+ggsave("../figures/flies.tif", 
+       plot = p, 
+       device = "tiff",
+       width = 3.2, 
+       height = 3.2,
+       units = "in",
+       dpi = 300)
+#
 ```
 
-----------------------------------------
 
-### Protein kinase
+## 2. The effect of a MAP Kinase Inhibitor on the number of nuclei in neurons
 
-This example concerns the effect of a Mitogen-activated protein (MAP) Kinase Inhibitor on the number of nuclei in neurons
-The importance of Mitogen-activated protein kinases in regulating cell division led researchers to hypothesise that MAPK inhibition might effect cytokinesis following mitosis. They treated samples of neurons with PD089059, a MAPK inhibitor, at various concentrations (1 to 15 in arbitrary units) and recorded the number of nuclei per cell.
-The data in are [kinase.txt](../data/kinase.txt). Each row is a cell. Can you predict the number of nuclei by PD089059 concentration?  
+The importance of Mitogen-activated protein (MAP) kinases in regulating cell division led researchers to hypothesise that MAPK inhibition might effect cytokinesis following mitosis. They treated samples of neurons with PD089059, a MAPK inhibitor, at various concentrations (1 to 15 in arbitrary units) and recorded the number of nuclei per cell.
+The data in are [kinase.txt](../data-raw/kinase.txt). Each row is a cell.   
 
 ```{r }
-#============== WORKBOOK EXAMPLE ==============#
 # The effect of a MAPK Kinase Inhibitor on the number of nuclei in neurons
-# write comments in your scripts!
-
+# library(tidyverse)
 # read in the data file
-kinase <- read.table("../data/kinase.txt", header = T)
+mapk <- read_table2("../data-raw/kinase.txt")
 
 # check you understand the structure of the data
-str(kinase)
-# there are two variables and 30 observations. Both variables are integers
+str(mapk)
+# there are two numeric variables
 
 # identify the response and explanatory variables
-# the response is 'nuclei'; the explanatory variable is 'pdconc'
+# the response is the number of nuclei in a call; pdconc, the concentration of PD089059 is the explanatory variable
 
-# build a model with `glm()`
-mod <- glm(data = kinase, nuclei ~ pdconc, family = "poisson")
+# make a quick plot of the data and summarise it
+ggplot(data = mapk, aes(x = pdconc, y = nuclei)) +
+  geom_point()
+# the three cells with the highest number of nuclei were treated with highest concentrations but the pattern is not strong.
 
-# examine the model result using `summary()` and `anova()`
+# build a model with `glm()` and examine it using `summary()`
+mod <- glm(data = mapk, nuclei ~ pdconc, family = poisson)
+
+# what are the model coefficients?
+mod
+exp(mod$coefficients)
+# b0 is 0.007736 and b1 is 0.085826   
+# this predicts 1.007766 nuclei at concentration of zero. This changes by a factor of 1.089617 for each unit of concentration (ie., increases)
+# the equation of the line is ln(nuclei)  = 0.007736 + 0.085826   × conc or
+# nuclei = 1.007766 * 1.089617^conc
+
+# what is the null deviance of the response? And the residual deviance of model? 
 summary(mod)
+# the Null deviance is 63.03  and the Residual deviance is 55.24  
+
+# determine the reduction in deviance and whether it is significant 
+# the deviance has reduced by 7.7891
 anova(mod, test = "Chisq")
+# this is a significant reduction p = 0.005256 
 
-# what are the model estimates?
-# can be read from summary or accessed like this:
-mod$coefficients
-# note that the lm() estimates could have been accessed this way too
-
-# the model estimates are logged (to base e), therefore need to be antilogged for interpretation. Antilog is exp()
-exp(mod$coefficients) 
-# (Intercept)      pdconc 
-#    1.007766    1.089617  
-
-# interpret the results 
-# 1.01 nuclei are expected when pdconc is zero (the intercept). For each unit increase in pdconce, the number that nuclei increases significantly by a factor of 1.09 (p = 0.00624).
-# The Analysis of Deviance Table shows that overall the model is significantly better than a NULL model. A null model is one in which the response is unexplained. Another way to express this is to say the model explains a signifcant amount of variation in the response.
-# For glm() it is deviance rather than variance that tells us about model fit.
-
-# use `plot(mod, which = 1)` and `plot(mod, which = 2)` to examine the assumptions
+# evaluate whether the assumptions of the model are met
 plot(mod, which = 1)
 plot(mod, which = 2)
-# These look ok, though note that it is difficult to tell with small samples. However, there is nothing that screams the assumptions are unmet.
+# these look 'ok' 
 
-# plot
-ggplot(data = kinase, aes(x = pdconc, y = nuclei)) +
-  geom_point() + 
-  geom_smooth(method = "glm",
+# use `predict()` to make predictions for a set sensible values for the explanatory variable(s)   
+# her I do it for concentrations from 0 to 10 days in steps of 2.5 units.
+# In reality, you probably wouldn't need this at the concentrations are already in nice round units - 0 - 14 in steps of one. So you could just predict for the model with
+# mapk$pred <- predict(mod, type = "response")
+# I've done it for different values just to provide another example fo doing it
+# create a data frame of the x values from which you want to predict
+predictions <- data.frame(pdconc = seq(0, 10, 2.5))
+# add predictions to that data.frame
+predictions$pred <- predict(mod, newdata = predictions, type = "response")
+
+# write a report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
+p <- ggplot(data = mapk, aes(x = pdconc, y = nuclei)) +
+  geom_point() +
+geom_smooth(method = "glm",
               method.args = list(family = "poisson"),
-              se = FALSE) +
-  xlab("PD089059 concentration") +
-  ylab("Number of nuclei") +
+              se = FALSE,
+            colour = "black") +
+  scale_x_continuous(expand = c(0, 0),
+                     limits = c(0, 15),
+                     name = "PD089059 concentration (arbitrary units)") +
+    scale_y_continuous(expand = c(0, 0.03),
+                      breaks = seq(0, 10, 1),
+                     limits = c(0, 10),
+                     name = "Number of nuclei") +
   theme_classic()
+
+ggsave("../figures/mapk.tif", 
+       plot = p, 
+       device = "tiff",
+       width = 3.2, 
+       height = 3.2,
+       units = "in",
+       dpi = 300)
+
 
 ```
 
 ----------------------------------------
 
 
-## Section 2
+# Optional Extension
 
-**Choose one of the following examples**
+## 3. Effect of age and cancer status on the number of mutations
 
-### Number of mutations
-
-This example is about how the number of mutations in a hypermutable tetranucleotide marker is affected by a person's age and whether of not they have cancer.
-The number of mutations in the hypermutable tetranucleotide marker D7S1482 were analysed in buccal specimens from 30 head and neck carcinoma cases and 43 controls. Also recorded was the subject's age (in years). The goal of analysis was to determine whether age and cancer status could predict the number of mutations. The data are in  [mutation.txt](../data/mutation.txt) and comprise the following variables:
+The number of mutations in the hypermutable tetranucleotide marker D7S1482 were analysed in buccal specimens from 30 head and neck carcinoma cases and 43 controls. Also recorded was the subject's age (in years). The goal of analysis was to determine whether age and cancer status could predict the number of mutations. The data are in  [mutation.txt](../data-raw/mutation.txt) and comprise the following variables:
 
 * mut : the number of mutations
 * age : a continuous measure of the subject's age to the nearest 0.1 of a degree.
@@ -220,10 +255,9 @@ The number of mutations in the hypermutable tetranucleotide marker D7S1482 were 
 
 
 ```{r }
-#============== WORKBOOK EXAMPLE ==============#
-#The effect of age and cancer status on the number of mutations in a hypermutable tetranucleotide marker
+# The effect of age and cancer status on the number of mutations in a hypermutable tetranucleotide marker
 # read in the data file
-mutation <- read.table("../data/mutation.txt", header = TRUE)
+mutation <- read_table2("../data-raw/mutation.txt")
 
 # check you understand the structure of the data
 str(mutation)
@@ -243,7 +277,6 @@ anova(mod, test = "Chisq")
 # what are the model estimates?
 # can be read from summary or accessed like this:
 mod$coefficients
-# note that the lm() estimates could have been accessed this way too
 
 # the model estimates are logged (to base e), therefore need to be antilogged for interpretation. Antilog is exp()
 exp(mod$coefficients) 
@@ -280,8 +313,6 @@ ggplot(data = mutation, aes(x = age, y = mut, colour = cat)) +
   theme_classic()
 
 ```
-
-
 
 
 # The Rmd file

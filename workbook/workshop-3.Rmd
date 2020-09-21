@@ -63,18 +63,17 @@ For each data scenario:
 * check you understand the structure of the data
 * identify the response and explanatory variables
 * make a quick plot of the data and summarise it
-* build a model with `lm()` and examine it using `summary()`
-* what are the model coefficients and how do they relate to the group means
-* what proportion of the variance in the response is explained by the model? 
-* evaluate whether the assumptions of the linear model are met
-* determine whether the effects are significant  
+* build a model with `glm()` and examine it using `summary()`
+* what are the model coefficients and how do these relate to the response?  
+* what is the null deviance of the response? And the residual deviance of model? 
+* determine the reduction in deviance and whether it is significant 
+* evaluate whether the assumptions of the model are met
+* use `predict()` to make predictions for a set sensible values for the explanatory variable(s)   
 * write a report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
-* post your report to the padlet
+* post your report to the Padlet
 * go through your code adding comments, removing code that no longer reflects steps in your analysis and reporting, and reordering where necessary  
-* examine some of the other reports posted on the padlet. What did you do well? What could you have done better? Add these as comments to your own padlet post
+* examine some of the other reports posted on the Padlet. What did you do well? What could you have done better? Add these as comments to your own Padlet post
 * make sure the RStudio Project and the googledoc is shared with everyone in your group
-
-
 
 # Data scenarios
 

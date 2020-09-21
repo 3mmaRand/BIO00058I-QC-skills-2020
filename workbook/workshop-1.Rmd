@@ -64,9 +64,9 @@ For each data scenario:
 * evaluate whether the assumptions of the linear model are met
 * determine whether the effects are significant  
 * write a report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
-* post your report to the padlet
+* post your report to the Padlet
 * go through your code adding comments, removing code that no longer reflects steps in your analysis and reporting, and reordering where necessary  
-* examine some of the other reports posted on the padlet. What did you do well? What could you have done better? Add these as comments to your own padlet post
+* examine some of the other reports posted on the Padlet. What did you do well? What could you have done better? Add these as comments to your own Padlet post
 * make sure the RStudio Project and the googledoc is shared with everyone in your group
 
 
