@@ -1,5 +1,5 @@
 ---
-title:  "Topic 1: Linear models: t-tests and ANOVA revisited."
+title:  "Topic 1: Understanding of General Linear Models."
 author: "Emma Rand"
 output:
   html_document:
@@ -40,13 +40,8 @@ Note that you should also be able to report the results of the examples and work
 
 ## Independent Study
 
-This should have been carried out before the workshop.
-There is a text book, gist-lm: Get Introductory Statistical Tests as Linear models: A guide for R users to support this topic which is freely available here:  [gist-lm: Get Introductory Statistical Tests as Linear models: A guide for R users](https://3mmarand.github.io/gist-lm/)
-
-We suggested you carry out the independent study in two sessions:
-
-1. Read the Preface, Introduction (Chapters 1-3) and Chapter 4 Single linear regression
-2. Read Chapters 6 and 7
+This should have been carried out before the workshop. The minimum independent study required was to read the Preface and chapters 2, 5 and 6 of [gist-lm:](https://3mmarand.github.io/gist-lm/) ***G**et **I**ntroductory **S**tatistical **T**ests as **L**inear **M**odels: A guide for R users*.
+An optional extension was to read chapter 7 in preparation for the optional extension data scenario.
 
 # Instructions
 
@@ -260,6 +255,9 @@ ggsave("../figures/lchc.tif",
 ```
 
 
+# Optional Extension
+
+Optional independent study: chapter 7 of [gist-lm:](https://3mmarand.github.io/gist-lm/) ***G**et **I**ntroductory **S**tatistical **T**ests as **L**inear **M**odels: A guide for R users*.
 
 ## 3. Choline deficiency on neuron size
 
@@ -414,7 +412,7 @@ ggsave("../figures/neuron.tif",
 # The Rmd file
 
 
-[Rmd file](QCworkshop1DataAnalysis.Rmd)
+[Rmd file](workshop-1.Rmd)
 
 
 ![](../pics/58Iend.png)

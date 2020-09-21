@@ -12,60 +12,73 @@ output:
   word_document: default
 ---
 ![](../pics/58I.png)
-
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE,
+knitr::opts_chunk$set(include = FALSE,
                       message = FALSE,
                       warning = FALSE,
                       include = FALSE)
 ```
 
 ```{r pkgs}
-library(ggplot2)
-```  
+library(tidyverse)
+library(multcomp)
+```
 
 # Introduction
 
 ## Aims
-In the third of three related workshops we will learn to apply and interpret the glm() function to binary (binomial) response data.
+There are two aims for this topic. First to explain how the t-test, ANOVA and regression are actually all the same test and introduce the terminology of statistical modelling and, secondly, to teach you how to use and interpret the `lm()` function in R. 
 
 ## Objectives 
-By actively following the first lecture, working through workbook examples during the workshop workshop and any completing follow-up independent study the successful student will be able to:
+By doing the independent study before each Blackboard workshop and working with others to solve workshop problems the successful student will be able to:
 
-* Explain the link between the general linear models and the generalised linear model
-* Recognise where a generalised linear model for binomially distributed data would be appropriate and apply `glm()`
-* Determine which effects are significant using using `summary()` and `anova()`
+* Explain the link between t-tests, ANOVA and regression
+* Appropriately apply linear models using `lm()`
+* Interpret the results and relate them to the outputs of `t.test()` and `aov()`
 
-You can optionally stretch yourself by asking for more in-depth explanations about the meaning of the estimates, and the direction and magnitude of the effects or creating figures to go with your analyses. Biomedical Scientists might be particularly interested in binomial glm estimates ('odds ratios').
+Note that you should also be able to report the results of the examples and workshop problems which was a Stage 1 learning objective for 17C and 8C.
 
+## Independent Study
 
-# Workbook Instructions
+This should have been carried out before the workshop.
+There is a text book, gist-lm: Get Introductory Statistical Tests as Linear models: A guide for R users to support this topic which is freely available here:  [gist-lm: Get Introductory Statistical Tests as Linear models: A guide for R users](https://3mmarand.github.io/gist-lm/)
 
-The workbook for this session is divided in to 2 sections. 
+We suggested you carry out the independent study in two sessions:
 
-**You are not expected do all of the workbook examples**
+1. Read the Preface, Introduction (Chapters 1-3) and Chapter 4 Single linear regression
+2. Read Chapters 6 and 7
 
-Choose **one** from each section that best matches your biological interests. For each example you choose, you should:
+# Instructions
 
-* write comments in your scripts!
-* read in the data file
+Designate roles: 
+
+1. the code host  
+2. the report host  
+
+The code host types the code and comments that you collaboratively write. The report host types the report using googledocs that you collaboratively write. At the start of a problem the code host shares their screen showing RStudio and towards the end, the report host will share their screen.
+
+For each data scenario:
+
+* use a new RStudio Project containing folders: `data-raw`, `scripts` and `figures`
 * check you understand the structure of the data
 * identify the response and explanatory variables
-* build a model with `glm()`
-* examine the model result using `summary()` and `anova()`
-* what are the model estimates?
-* interpret the results - you might find it helpful to use `predict()`  
-* use `plot(mod, which = 1)` and `plot(mod, which = 2)` to examine the assumptions
+* make a quick plot of the data and summarise it
+* build a model with `lm()` and examine it using `summary()`
+* what are the model coefficients and how do they relate to the group means
+* what proportion of the variance in the response is explained by the model? 
+* evaluate whether the assumptions of the linear model are met
+* determine whether the effects are significant  
+* write a report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
+* post your report to the padlet
+* go through your code adding comments, removing code that no longer reflects steps in your analysis and reporting, and reordering where necessary  
+* examine some of the other reports posted on the padlet. What did you do well? What could you have done better? Add these as comments to your own padlet post
+* make sure the RStudio Project and the googledoc is shared with everyone in your group
 
-Optional Extension: Practice your plotting skills.
 
 
-## Section 1
+# Data scenarios
 
-**Choose one of:**
-
-----------------------------------------
-
+ DONE ABOVE 
 ### Wolf Spiders
 
 This example concerns the effect of sand grain size on the presence of wolf spiders.
