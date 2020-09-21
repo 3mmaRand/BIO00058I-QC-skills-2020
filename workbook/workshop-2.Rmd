@@ -1,5 +1,5 @@
 ---
-title:  "Topic 1: Linear models: t-tests and ANOVA revisited."
+title:  "Topic 2: Generalised Linear Models for Poisson distributed data."
 author: "Emma Rand"
 output:
   html_document:

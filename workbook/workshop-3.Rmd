@@ -1,5 +1,5 @@
 ---
-title:  "Generalised Linear Models for Binomially distributed data."
+title:  "Topic 3: Generalised Linear Models for Binomially distributed data."
 author: "Emma Rand"
 output:
   html_document:
