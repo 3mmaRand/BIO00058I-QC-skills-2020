@@ -134,9 +134,9 @@ plot(mod, which = 2)
 # use `predict()` to make predictions for a set sensible values for the explanatory variable(s)   
 # her I do it for ages from 10 to 30 days in steps of 5 days (5 values)
 # create a data frame of the x values from which you want to predict
-predictions <- data.frame(age = seq(10, 30, 5))
+predict_for <- data.frame(age = seq(10, 30, 5))
 # add predictions to that data.frame
-predictions$pred <- predict(mod, newdata = predictions, type = "response")
+predict_for$pred <- predict(mod, newdata = predict_for, type = "response")
 
 # write a report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
 p <- ggplot(data = park, aes(x = age, y = flies)) +
@@ -219,9 +219,9 @@ plot(mod, which = 2)
 # mapk$pred <- predict(mod, type = "response")
 # I've done it for different values just to provide another example fo doing it
 # create a data frame of the x values from which you want to predict
-predictions <- data.frame(pdconc = seq(0, 10, 2.5))
+predict_for <- data.frame(pdconc = seq(0, 10, 2.5))
 # add predictions to that data.frame
-predictions$pred <- predict(mod, newdata = predictions, type = "response")
+predict_for$pred <- predict(mod, newdata = predict_for, type = "response")
 
 # write a report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
 p <- ggplot(data = mapk, aes(x = pdconc, y = nuclei)) +
@@ -298,9 +298,9 @@ exp(mod$coefficients)
 
 # one way to help you think about the results is to make the predictions
 # this requires creating a data frame of the x values fromn which you want to predict
-newdata <- data.frame(cat = rep(c("control", "tumour"), each = 3), age = rep(c(0:2), times = 2))
+predict_for <- data.frame(cat = rep(c("control", "tumour"), each = 3), age = rep(c(0:2), times = 2))
 # then predicting
-newdata$pred <- predict(mod, newdata = newdata, type = "response")
+predict_for$pred <- predict(mod, newdata = predict_for, type = "response")
 # The Analysis of Deviance Table shows that the effects of age, cat and the interaction between them are significant.
 # For glm() it is deviance rather than variance that tells us about model fit.
 
