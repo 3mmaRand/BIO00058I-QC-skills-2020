@@ -77,7 +77,6 @@ For each data scenario:
 * what are the model coefficients and how do these relate to the response?  
 * what is the null deviance of the response? And the residual deviance of model? 
 * determine the reduction in deviance and whether it is significant 
-* evaluate whether the assumptions of the model are met
 * use `predict()` to make predictions for a set sensible values for the explanatory variable(s)   
 * write a report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
 * post your report to the Padlet
