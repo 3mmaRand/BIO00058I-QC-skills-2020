@@ -53,7 +53,7 @@ Designate roles:
 4. the researchers
 
 The code host opens RStudio and shares their screen. They type the code and comments that you collaboratively write. The report host creates a googledoc which they share with all the group members. You collaboratively write the googledoc. I suggest the start is used for ideas and comments before you add a report you collaboratively write. At the start of a problem the code host shares their screen showing RStudio and towards the end, the report host will share their screen.
-The chat monitor makes sure everyone is aware of breaking news and ideas in the chat that they might miss if focussed on the googledoc or RStudio. The researchers keep the group on track making sure the items in the list below are addressed and looking up things in 17C / 08C and [gist-lm:](https://3mmarand.github.io/gist-lm/)
+The chat monitor makes sure everyone is aware of breaking news and ideas in the chat that they might miss if focussed on the googledoc or RStudio. The researchers keep the group on track making sure the items in the list below are addressed and looking up things in 17C / 08C and [singlm:](https://3mmarand.github.io/singlm/).
 
 <font size = "4">
 `r emo::ji("heart")` Be kind, be understanding, be flexible  
