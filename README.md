@@ -59,7 +59,7 @@ We will not cover methods which are specific to the Experimental Design / Biosci
 
 ### Week 3
 1. [Workshop for Topic 2](https://3mmarand.github.io/BIO00058I-QC-skills-2020/workbook/workshop-2.html): Generalised Linear Models for Poisson response variables   
-2. Prior study for Topic 3: There is a text book, *singlm: Simple introduction to GLM for analysing Poisson and Binomial responses in R* to support this topic which is freely available here:  https://3mmarand.github.io/singlm/.  The minimum independent study is to read Chapters X, X and X. Optionally you can read Chapter X in preparation for optional workshop problems
+2. Prior study for Topic 3: There is a text book, *singlm: Simple introduction to GLM for analysing Poisson and Binomial responses in R* to support this topic which is freely available here:  https://3mmarand.github.io/singlm/.  The minimum independent study is to read Chapters 5 and 6. 
 
 ### Week 4
 1. [Workshop for Topic 3](https://3mmarand.github.io/BIO00058I-QC-skills-2020/workbook/workshop-3.html): Generalised Linear Models for Binomial response variables      
