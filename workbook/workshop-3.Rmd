@@ -84,7 +84,7 @@ For each data scenario:
 
 ## 1. Wolf beach
 
-Suzuki et al. (2006) measured sand grain size (mm) on 28 beaches in Japan and observed the presence or absence of the burrowing wolf spider *Lycosa ishikariana* on each beach. The data are in [grainsize.txt](../data-raw/grainsize.txt). Can you predict the presence of beach from the sand grain size? 
+Suzuki et al. (2006) measured sand grain size (mm) on 28 beaches in Japan and observed the presence or absence of the burrowing wolf spider *Lycosa ishikariana* on each beach. The data are in [grainsize.txt](../data-raw/grainsize.txt). Can you predict the presence of spiders on a beach from the sand grain size? 
 
 
 ```{r }
