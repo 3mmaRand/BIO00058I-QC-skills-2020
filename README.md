@@ -34,15 +34,15 @@ We will cover:
 
 1. Understanding of General Linear Models (that is, regression, *t*-tests and ANOVA) - Emma Rand
 
-*T*-tests, ANOVA and regression are used when we have a *continuous* response variable. We revisit these using a linear modelling framework. This means using a single function `lm()` rather than three different ones and enhancing our understanding of the concepts underlying the tests. Learning more about the model assumptions, estimated coefficients and model fit in this familiar context will make it easier to understand them in the new linear modelling context.
+   *T*-tests, ANOVA and regression are used when we have a *continuous* response variable. We revisit these using a linear modelling framework. This means using a single function `lm()` rather than three different ones and enhancing our understanding of the concepts underlying the tests. Learning more about the model assumptions, estimated coefficients and model fit in this familiar context will make it easier to understand them in the new linear modelling context.
 
 2. Generalised Linear Models for Poisson response variables - Emma Rand
 
-The Generalised Linear Model is an extension of the General Linear model for situations where the response variable does not follow the normal distribution. Key differences between General Linear Models and Generalised Linear Models is that estimates are on a different scale and we use deviance rather than variance for fit.  Here we consider GLMs when your response variable is a count where the coefficients are logged.
+   The Generalised Linear Model is an extension of the General Linear model for situations where the response variable does not follow the normal distribution. Key differences between General Linear Models and Generalised Linear Models is that estimates are on a different scale and we use deviance rather than variance for fit.  Here we consider GLMs when your response variable is a count where the coefficients are logged.
 
 3. Generalised Linear Models for Binomial response variables  - Emma Rand
 
-Here we consider GLMs when your response variable can take only one of two values such as 0 or 1 or dead and alive. These variables follow a binomial distribution. Their estimates are on a "logit" scale.
+   Here we consider GLMs when your response variable can take only one of two values such as 0 or 1 or dead and alive. These variables follow a binomial distribution. Their estimates are on a "logit" scale.
 
 4. Non-linear Models (non-linear regression) - Jon Pitchford
 
