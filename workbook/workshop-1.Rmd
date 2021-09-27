@@ -14,6 +14,8 @@ output:
   word_document: default
 ---
 ![](../pics/58I.png)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5532590.svg)](https://doi.org/10.5281/zenodo.5532590)
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(include = FALSE,
                       message = FALSE,
@@ -466,5 +468,6 @@ PrintBibliography(myBib)
 
 
 ![](../pics/58Iend.png)
+Emma Rand. (2021). Quantitative and Computational Skills strand of BIO00058I Laboratory and Professional Skills for Bioscientists II: 2021-22 edition (v1.1). Zenodo. https://doi.org/10.5281/zenodo.5532590
 
 
