@@ -8,7 +8,9 @@ output:
     toc_float:
       collapsed: false
       smooth_scroll: false
-    theme: yeti
+    theme: flatly
+    highlight: pygments
+    css: [../css_files/emma-workshop.css, ../css_files/emma-fonts.css]
   word_document: default
 ---
 ![](../pics/58I.png)
@@ -20,9 +22,24 @@ knitr::opts_chunk$set(include = FALSE,
 ```
 
 ```{r pkgs}
+library(RefManageR)
 library(tidyverse)
-library(multcomp)
+
 ```
+
+
+```{r, load-refs, include=FALSE, cache=FALSE}
+BibOptions(check.entries = FALSE,
+           bib.style = "authoryear",
+           cite.style = "authoryear",
+           style = "markdown",
+           hyperlink = TRUE,
+           dashed = FALSE,
+           longnamesfirst = FALSE,
+           max.names = 2)
+myBib <- ReadBib("../refs/references.bib", check = FALSE)
+```
+
 
 # Introduction
 
@@ -30,7 +47,7 @@ library(multcomp)
 The aim for this topic is to teach you how to use and interpret the `glm()` function in R for response data which are Poisson distributed (counts). 
 
 ## Objectives 
-By doing the independent study before each Blackboard workshop and working with others to solve workshop problems the successful student will be able to:
+By doing the independent study before each workshop and working with others to solve workshop problems the successful student will be able to:
 
 * Explain the link between the general linear models and the generalised linear model
 * Recognise a Poisson distributed response variable
@@ -43,55 +60,44 @@ By doing the independent study before each Blackboard workshop and working with 
 The minimum independent study required was to read the Preface and chapters 1, 2 and 3 of [singlm:](https://3mmarand.github.io/singlm/) ***S**imple **In**troduction to **GLM** for analysing Poisson and Binomial responses in R*.
 An optional extension was to read chapter 4 in preparation for the optional extension data scenario.
 
-# Instructions
-
-Designate roles: 
-
-1. the code host  
-2. the report host  
-3. chat monitor
-4. the researchers
-
-The code host opens RStudio and shares their screen. They type the code and comments that you collaboratively write. The report host creates a googledoc which they share with all the group members. You collaboratively write the googledoc. I suggest the start is used for ideas and comments before you add a report you collaboratively write. At the start of a problem the code host shares their screen showing RStudio and towards the end, the report host will share their screen.
-The chat monitor makes sure everyone is aware of breaking news and ideas in the chat that they might miss if focussed on the googledoc or RStudio. The researchers keep the group on track making sure the items in the list below are addressed and looking up things in 17C / 08C and [singlm:](https://3mmarand.github.io/singlm/).
-
-<font size = "4">
-`r emo::ji("heart")` Be kind, be understanding, be flexible  
-`r emo::ji("document")` Use collaborative notes - document your ideas and process.  
-`r emo::ji("flower")` Contribute actively to the coding and reporting - your code and report hosts should not feel they have all the responsibility.  
-`r emo::ji("heart")`Allow people to contribute to the process silently by writing in the googledoc or using the chat  
-</font>
+I recommend:
+-  discussing the examples with others
+-  having open the book: [singlm:](https://3mmarand.github.io/singlm/) ***S**imple **In**troduction to **GLM** for analysing Poisson and Binomial responses in R*
 
 For each data scenario:
 
-* use a new RStudio Project containing folders: `data-raw`, `scripts` and `figures`
-* check you understand the structure of the data
-* identify the response and explanatory variables
-* make a quick plot of the data and summarise it
-* build a model with `glm()` and examine it using `summary()`
-* what are the model coefficients and how do these relate to the response?
-* what is the null deviance of the response? And the residual deviance of model? 
-* determine the reduction in deviance and whether it is significant 
-* use `predict()` to make predictions for a set sensible values for the explanatory variable(s)   
-* write a report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
-* post your report to the Padlet
-* go through your code adding comments, removing code that no longer reflects steps in your analysis and reporting, and reordering where necessary  
-* examine some of the other reports posted on the Padlet. What did you do well? What could you have done better? Add these as comments to your own Padlet post
-* make sure the RStudio Project and the googledoc is shared with everyone in your group
-
-
+-  use a new RStudio Project containing folders: `data-raw`, `scripts` and `figures` 
+-  check you understand the structure of the data
+-  identify the response and explanatory variables
+-  make a quick plot of the data and summarise it
+-  build a model with `glm()` and examine it using `summary()`
+-  what are the model coefficients and how do these relate to the response?
+-  what is the null deviance of the response? And the residual deviance of model?
+-  determine the reduction in deviance and whether it is significant 
+-  use `predict()` to make predictions for a set sensible values for the explanatory variable(s) 
+-  write a mini-report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
+-  go through your code adding comments, removing code that no longer reflects steps in your analysis and reporting, and reordering where necessary  
 
 # Data scenarios
 
 ## 1. The effect of age on locomotor ability of mutant flies
 The effect of age on locomotor ability of *Drosophila* with a Parkinson's disease-associated mutation was determined by using a climbing assay. Ten flies of each tested age (in days) were placed in 3 replicate vials and the number able to climb to a set height within a set time was recorded. The data in are [park.txt](../data-raw/park.txt). Each row is a vial.   
 
+<div class = "key">
+
+`r emo::ji("eyes")`
+
+`r emo::ji("exclamation")``tidyverse` has renamed the `read_table2()` function to `read_table2()`  
+
+</div>
+
+
+
 ```{r }
 # Disease progression in Parkinson's disease-associated mutants
 
-# library(tidyverse)
 # read in the data file
-park <- read_table2("../data-raw/park.txt")
+park <- read_table("../data-raw/park.txt")
 
 # check you understand the structure of the data
 str(park)
@@ -173,7 +179,7 @@ The data in are [kinase.txt](../data-raw/kinase.txt). Each row is a cell.
 # The effect of a MAPK Kinase Inhibitor on the number of nuclei in neurons
 # library(tidyverse)
 # read in the data file
-mapk <- read_table2("../data-raw/kinase.txt")
+mapk <- read_table("../data-raw/kinase.txt")
 
 # check you understand the structure of the data
 str(mapk)
@@ -266,7 +272,7 @@ The number of mutations in the hypermutable tetranucleotide marker D7S1482 were 
 ```{r }
 # The effect of age and cancer status on the number of mutations in a hypermutable tetranucleotide marker
 # read in the data file
-mutation <- read_table2("../data-raw/mutation.txt")
+mutation <- read_table("../data-raw/mutation.txt")
 
 # check you understand the structure of the data
 str(mutation)
@@ -287,16 +293,16 @@ anova(mod, test = "Chisq")
 # can be read from summary or accessed like this:
 mod$coefficients
 
-# the model estimates are logged (to base e), therefore need to be antilogged for interpretation. Antilog is exp()
+# the model estimates are logged (to base e), therefore need to be anti logged for interpretation. Antilog is exp()
 exp(mod$coefficients) 
 # (Intercept)     cattumour           age cattumour:age 
 #    7.863668      1.335158      1.008159      1.015422  
 
 # interpret the results 
-# the intercept is the number of mutations when the cat factor is control (level 1) and age is zero, 7.89 mutations. This increases but not significantly, by a factor of 1.34 in the tumour group. For every unit increase in age in the control group, the number of mutations increases by a factor of 1.01 (NS) but there is a bigger effect of age on the number of mutations in the tumour group. Based on the effects of cat and age we would expect an increasee of 7.863668*1.008159*1.335158 = 10.5849 mutations per unit of age in the tumour group. But we get 7.863668*1.008159*1.335158*1.015422 = 10.74814
+# the intercept is the number of mutations when the cat factor is control (level 1) and age is zero, 7.89 mutations. This increases but not significantly, by a factor of 1.34 in the tumour group. For every unit increase in age in the control group, the number of mutations increases by a factor of 1.01 (NS) but there is a bigger effect of age on the number of mutations in the tumour group. Based on the effects of cat and age we would expect an increase  of 7.863668*1.008159*1.335158 = 10.5849 mutations per unit of age in the tumour group. But we get 7.863668*1.008159*1.335158*1.015422 = 10.74814
 
 # one way to help you think about the results is to make the predictions
-# this requires creating a data frame of the x values fromn which you want to predict
+# this requires creating a data frame of the x values from which you want to predict
 predict_for <- data.frame(cat = rep(c("control", "tumour"), each = 3), age = rep(c(0:2), times = 2))
 # then predicting
 predict_for$pred <- predict(mod, newdata = predict_for, type = "response")
@@ -324,9 +330,20 @@ ggplot(data = mutation, aes(x = age, y = mut, colour = cat)) +
 ```
 
 
-# The Rmd file
+# The code files
 
-[Rmd file](workshop-2.Rmd)
+These contain all the code needed in the workshop even where it is not visible on the webpage.
+
+[Rmd file](workshop-2.Rmd) The Rmd file is the file I use to compile the practical. Rmd stands for R markdown. It allows R code and ordinary text to be interweaved to produce well-formatted reports including webpages. If you right-click on the link and choose Save-As, you will be able to open the Rmd file in RStudio. Alternatively, [View in Browser](https://github.com/3mmaRand/BIO00058I-QC-skills-2020/blob/master/workbook/workshop-2.Rmd).
+
+
+Pages made with `rmarkdown` `r Cite(myBib, c("markdown1","markdown2"))`, `kableExtra` `r Cite(myBib, "kableExtra")`, `RefManager` `r Cite(myBib, "RefManager")`
+
+# References
+
+```{r refs, echo=FALSE, results="asis", include=TRUE}
+PrintBibliography(myBib)  
+```
 
 
 

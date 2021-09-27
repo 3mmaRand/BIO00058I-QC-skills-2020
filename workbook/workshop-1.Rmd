@@ -22,9 +22,22 @@ knitr::opts_chunk$set(include = FALSE,
 ```
 
 ```{r pkgs}
+library(RefManageR)
 library(tidyverse)
 library(lsmeans)
 library(multcompView)
+```
+
+```{r, load-refs, include=FALSE, cache=FALSE}
+BibOptions(check.entries = FALSE,
+           bib.style = "authoryear",
+           cite.style = "authoryear",
+           style = "markdown",
+           hyperlink = TRUE,
+           dashed = FALSE,
+           longnamesfirst = FALSE,
+           max.names = 2)
+myBib <- ReadBib("../refs/references.bib", check = FALSE)
 ```
 
 # Introduction
@@ -68,7 +81,31 @@ For each data scenario:
 -  write a mini-report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
 -  go through your code adding comments, removing code that no longer reflects steps in your analysis and reporting, and reordering where necessary  
 
+<div class = "key">
 
+**Tip**
+
+load the `tidyverse` `r Cite(myBib, "tidyverse")` with `library(tidyverse)`
+
+What other packages might you need?
+
+</div>
+
+<div class = "key">
+
+**Tip**
+
+You can save a ggplot figure, fig1 with:
+```
+ggsave("figures/my-great-figure.png",
+       plot = fig1,
+       device = "png",
+       width = 5,
+       height = 4,
+       units = "in",
+       dpi = 300)
+```
+</div>
 
 # Data scenarios
 
@@ -412,10 +449,20 @@ ggsave("../figures/neuron.tif",
 ```
 
 
-# The Rmd file
+# The code files
+
+These contain all the code needed in the workshop even where it is not visible on the webpage.
+
+[Rmd file](workshop-1.Rmd) The Rmd file is the file I use to compile the practical. Rmd stands for R markdown. It allows R code and ordinary text to be interweaved to produce well-formatted reports including webpages. If you right-click on the link and choose Save-As, you will be able to open the Rmd file in RStudio. Alternatively, [View in Browser](https://github.com/3mmaRand/BIO00058I-QC-skills-2020/blob/master/workbook/workshop-1.Rmd).
 
 
-[Rmd file](workshop-1.Rmd)
+Pages made with `rmarkdown` `r Cite(myBib, c("markdown1","markdown2"))`, `kableExtra` `r Cite(myBib, "kableExtra")`, `RefManager` `r Cite(myBib, "RefManager")`
+
+# References
+
+```{r refs, echo=FALSE, results="asis", include=TRUE}
+PrintBibliography(myBib)  
+```
 
 
 ![](../pics/58Iend.png)
