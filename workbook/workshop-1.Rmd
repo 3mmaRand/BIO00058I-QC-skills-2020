@@ -71,7 +71,7 @@ I recommend:
 
 For each data scenario:
 
--  use a new RStudio Project containing folders: `data-raw`, `scripts` and `figures` and use a new script for Data scenario
+-  use a new RStudio Project containing folders: `data-raw`, `scripts` and `figures` 
 -  check you understand the structure of the data
 -  identify the response and explanatory variables
 -  make a quick plot of the data and summarise it
