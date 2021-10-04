@@ -1,36 +1,18 @@
----
-title:  "Topic 1: Understanding of General Linear Models."
-author: "Emma Rand"
-output:
-  html_document:
-    toc: true
-    depth: 3
-    toc_float:
-      collapsed: false
-      smooth_scroll: false
-    theme: flatly
-    highlight: pygments
-    css: [../css_files/emma-workshop.css, ../css_files/emma-fonts.css]
-  word_document: default
----
-![](../pics/58I.png)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5532590.svg)](https://doi.org/10.5281/zenodo.5532590)
-
-```{r setup, include=FALSE}
+## ----setup, include=FALSE----------------------------------------------------------------------------
 knitr::opts_chunk$set(include = FALSE,
                       message = FALSE,
                       warning = FALSE,
                       include = FALSE)
-```
 
-```{r pkgs}
+
+## ----pkgs--------------------------------------------------------------------------------------------
 library(RefManageR)
 library(tidyverse)
 library(lsmeans)
 library(multcompView)
-```
 
-```{r, load-refs, include=FALSE, cache=FALSE}
+
+## ---- load-refs, include=FALSE, cache=FALSE----------------------------------------------------------
 BibOptions(check.entries = FALSE,
            bib.style = "authoryear",
            cite.style = "authoryear",
@@ -40,90 +22,9 @@ BibOptions(check.entries = FALSE,
            longnamesfirst = FALSE,
            max.names = 2)
 myBib <- ReadBib("../refs/references.bib", check = FALSE)
-```
-
-# Introduction
-
-## Aims
-There are two aims for this topic. First to explain how the *t*-test, ANOVA and regression are actually all the same test and introduce the terminology of statistical modelling and, secondly, to teach you how to use and interpret the `lm()` function in R. 
-
-## Objectives 
-By doing the independent study before each workshop and working with others to solve workshop problems the successful student will be able to:
-
-* Explain the link between *t*-tests, ANOVA and regression
-* Appropriately apply linear models using `lm()`
-* Interpret the results and relate them to the outputs of `t.test()` and `aov()`
-
-Note that you should also be able to report the results of the examples and workshop problems which was a Stage 1 learning objective for 17C and 8C.
-
-## Independent Study
-
-This should have been carried out before the workshop. The minimum independent study required was to read the Preface and chapters 2, 5 and 6 of [gist-lm:](https://3mmarand.github.io/gist-lm/) ***G**et **I**ntroductory **S**tatistical **T**ests as **L**inear **M**odels: A guide for R users*.
-An optional extension was to read chapter 7 in preparation for the optional extension data scenario.
-
-# Instructions
-
-I recommend:
--  discussing the examples with others
--  having open the book: [gist-lm:](https://3mmarand.github.io/gist-lm/) ***G**et **I**ntroductory **S**tatistical **T**ests as **L**inear **M**odels: A guide for R users*
--  looking up tests from 08C and 17C
 
 
-For each data scenario:
-
--  use a new RStudio Project containing folders: `data-raw`, `scripts` and `figures` and use a new script for Data scenario
--  check you understand the structure of the data
--  identify the response and explanatory variables
--  make a quick plot of the data and summarise it
--  build a model with `lm()` and examine it using `summary()`
--  what are the model coefficients and how do they relate to the group means
--  what proportion of the variance in the response is explained by the model? 
--  evaluate whether the assumptions of the linear model are met
--  determine whether the effects are significant  
--  write a mini-report on the results. This will be no more than a few sentences reporting the results and an accompanying figure which you also write to file. 
--  go through your code adding comments, removing code that no longer reflects steps in your analysis and reporting, and reordering where necessary  
-
-<div class = "key">
-
-**Tip**
-
-load the `tidyverse` `r Cite(myBib, "tidyverse")` with `library(tidyverse)`
-
-What other packages might you need?
-
-</div>
-
-<div class = "key">
-
-**Tip**
-
-You can save a ggplot figure, fig1 with:
-```
-ggsave("figures/my-great-figure.png",
-       plot = fig1,
-       device = "png",
-       width = 5,
-       height = 4,
-       units = "in",
-       dpi = 300)
-```
-</div>
-
-# Data scenarios
-
-## 1. Nicotinic acid on adipocytes
-
-Adiponectin is exclusively secreted from adipose tissue and modulates a number of metabolic processes. Its secretion can be affected by nicotinic acid. 3T3-L1 adipocytes were treated with nicotinic acid or with a control treatment and adiponectin concentration (pg/ml) measured. The data are in [adipocytes.txt](../data-raw/adipocytes.txt). Each row represents an independent sample of adipocytes and the first column gives the concentration adiponectin and the second column indicates whether they were treated with nicotinic acid or not.
-
-<div class = "key">
-
-`r emo::ji("eyes")`
-
-`r emo::ji("exclamation")``tidyverse` has renamed the `read_table2()` function to `read_table()`  
-
-</div>
-
-```{r }
+## ----------------------------------------------------------------------------------------------------
 # The effect of nicotinic acid treatment on the adiponectin secretion of an adipocytes cell line
 
 # read in the data file
@@ -199,14 +100,9 @@ ggsave("../figures/adiponectin.tif",
        units = "in",
        dpi = 300)
 
-```
 
 
-## 2. Comparing standardization Methods
-
-Researchers measure concentration of long-chain hydrocarbons, in a single unknown sample by three methods of standardisation using gas chromatography. They wish to determine whether the three standardisations methods give the same concentrations. The data are given in [analyte.txt](../data-raw/analyte.txt) and the first column gives the analyte concentration determined in parts per million and the second column indicates the standardisations method 'standard', 'internal standard' or 'standard addition'.
-
-```{r}
+## ----------------------------------------------------------------------------------------------------
 # The effect of standardization method on the concentration of long-chain hydrocarbons determined (ppm) from a single sample
 
 # read in the data file
@@ -295,18 +191,9 @@ ggsave("../figures/lchc.tif",
        units = "in",
        dpi = 300)
 
-```
 
 
-# Optional Extension
-
-Optional independent study: chapter 7 of [gist-lm:](https://3mmarand.github.io/gist-lm/) ***G**et **I**ntroductory **S**tatistical **T**ests as **L**inear **M**odels: A guide for R users*.
-
-## 3. Choline deficiency on neuron size
-
-Cognitive performance is influenced by the choline intake in utero. To better understand this phenomenon, pregnant mice were fed a control or choline-deficient diet and their offspring examined. The cross sectional area (CSA) of cholinergic neurons was determined in two brain regions, the MSN and the DB. The data are given in [neuronregion.txt](../data-raw/neuronregion.txt)
-
-```{r}
+## ----------------------------------------------------------------------------------------------------
 # The effect of maternal choline deficiency on neuron cross sectional area in two brain regions in Mice
 # read in the data file
 neuron <- read_table("../data-raw/neuronregion.txt")
@@ -448,26 +335,8 @@ ggsave("../figures/neuron.tif",
 
 
 
-```
 
 
-# The code files
-
-These contain all the code needed in the workshop even where it is not visible on the webpage.
-
-[Rmd file](workshop-1.Rmd) The Rmd file is the file I use to compile the practical. Rmd stands for R markdown. It allows R code and ordinary text to be interweaved to produce well-formatted reports including webpages. If you right-click on the link and choose Save-As, you will be able to open the Rmd file in RStudio. Alternatively, [View in Browser](https://github.com/3mmaRand/BIO00058I-QC-skills-2020/blob/master/workbook/workshop-1.Rmd).
-
-
-Pages made with `rmarkdown` `r Cite(myBib, c("markdown1","markdown2"))`, `kableExtra` `r Cite(myBib, "kableExtra")`, `RefManager` `r Cite(myBib, "RefManager")`
-
-# References
-
-```{r refs, echo=FALSE, results="asis", include=TRUE}
+## ----refs, echo=FALSE, results="asis", include=TRUE--------------------------------------------------
 PrintBibliography(myBib)  
-```
-
-
-![](../pics/58Iend.png)
-Emma Rand. (2021). Quantitative and Computational Skills strand of BIO00058I Laboratory and Professional Skills for Bioscientists II: 2021-22 edition (v1.1). Zenodo. https://doi.org/10.5281/zenodo.5532590
-
 
