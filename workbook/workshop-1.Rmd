@@ -115,13 +115,6 @@ ggsave("figures/my-great-figure.png",
 
 Adiponectin is exclusively secreted from adipose tissue and modulates a number of metabolic processes. Its secretion can be affected by nicotinic acid. 3T3-L1 adipocytes were treated with nicotinic acid or with a control treatment and adiponectin concentration (pg/ml) measured. The data are in [adipocytes.txt](../data-raw/adipocytes.txt). Each row represents an independent sample of adipocytes and the first column gives the concentration adiponectin and the second column indicates whether they were treated with nicotinic acid or not.
 
-<div class = "key">
-
-`r emo::ji("eyes")`
-
-`r emo::ji("exclamation")``tidyverse` has renamed the `read_table2()` function to `read_table()`  
-
-</div>
 
 ```{r }
 # The effect of nicotinic acid treatment on the adiponectin secretion of an adipocytes cell line
