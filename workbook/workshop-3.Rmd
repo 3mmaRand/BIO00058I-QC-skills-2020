@@ -134,14 +134,15 @@ anova(mod, test = "Chisq")
 # use `predict()` to make predictions for a set sensible values for the explanatory variable(s)   
 # here I do it for gsizes of 0, 0.5 and 1 mm
 # create a data frame of the x values from which you want to predict
-predict_for <- data.frame(gsize = c(0, 0.5, 1))
+predict_for <- data.frame(gsize = c(0, 0.2, 0.5, 1))
 # add predictions to that data.frame
 predict_for$pred <- predict(mod, newdata = predict_for, type = "response")
 predict_for
 #   gsize      pred
 # 1   0.0 0.1614302
-# 2   0.5 0.7136446
-# 3   1.0 0.9699368
+# 2   0.2 0.3490280
+# 3   0.5 0.7136446
+# 4   1.0 0.9699368
 # a bit on understanding odds
 # An odds is P(present) / P(absent)
 # At a grain size of 0, P(present) is 0.1614302, therefore p(absent) is 1-0.1614302

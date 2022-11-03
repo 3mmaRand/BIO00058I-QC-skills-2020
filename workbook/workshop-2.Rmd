@@ -40,7 +40,7 @@ BibOptions(check.entries = FALSE,
            dashed = FALSE,
            longnamesfirst = FALSE,
            max.names = 2)
-myBib <- ReadBib("../refs/references.bib", check = FALSE)
+  myBib <- ReadBib("../refs/references.bib", check = FALSE)
 ```
 
 
